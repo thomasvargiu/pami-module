@@ -63,9 +63,13 @@ Then you can call any method directly from the connection.
 ## EventManager
 
 The ```PamiModule``` client has an ```EventManager``` created only when you try to get it.  
-When the ```EventManager``` is created, it's attached to the event listener of original PAMI module injected into the client.  
-The triggered events  are instances of ```PamiModule\\PamiEvent``` and the name of the event is the class name of original PAMI event without its (```PAMI\Message\Event```) prefix and ```Event``` suffix.  
-So, if the original event is an instance of ```PAMI\Message\Event\BridgeEvent```, the name of the event in ```EventManager``` will be ```Bridge```.  
+When the ```EventManager``` is created, it's attached to the event listener of original PAMI module injected into the
+client.  
+The triggered events  are instances of ```PamiModule\\PamiEvent``` and the name of the event is the class name of
+original PAMI event without its ```PAMI\Message\Event\``` prefix and ```Event``` suffix (events name could be changed 
+in future releases).  
+So, if the original event is an instance of ```PAMI\Message\Event\BridgeEvent```, the name of the event in
+```EventManager``` will be ```Bridge```.  
 Of course, you can acces to the original event to retrieve event data.  
 The event target is the ```PamiModule``` client.  
 
