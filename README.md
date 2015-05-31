@@ -29,7 +29,7 @@ return [
         ],
         'client' => [
             'default' => [
-                'connection' => 'default', (optional) Default: client name
+                'connection' => 'default' // (optional) Default: client name
             ]
         ]
     ]
