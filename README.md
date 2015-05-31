@@ -1,15 +1,15 @@
 # PamiModule
 
+A ZF2 module for [PAMI](https://github.com/marcelog/PAMI) library.
+
 [![Build Status](https://travis-ci.org/thomasvargiu/pami-module.svg?branch=master)](https://travis-ci.org/thomasvargiu/pami-module)
 [![Code Coverage](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/?branch=master)
 [![Dependency Status](https://www.versioneye.com/user/projects/556a836563653200265f1600/badge.svg?style=flat)](https://www.versioneye.com/user/projects/556a836563653200265f1600)
 
-
-A ZF2 implementation for [PAMI](https://github.com/marcelog/PAMI) library.
-
-Status: *development*
+Status: *development*  
 Note: *10% developed as drunk*
+
 
 ## Configuration
 
@@ -29,17 +29,17 @@ return [
         ],
         'client' => [
             'default' => [
-                'connection' => 'default',
+                'connection' => 'default', (optional) Default: client name
             ]
         ]
     ]
 ]
 ```
 
-Then you can access to two services:
-
+Then you can retrieve two services from the service locator:
 - ```pami.connection.default```: PAMI original client
 - ```pami.client.default```: PamiModule client
+
 
 ## PamiModule Client
 
@@ -57,16 +57,17 @@ $client = $serviceLocator->get('pami.client.default');
 $connection = $client->getConnection();
 ```
 
-Then you can call any method directly from the connection;
+Then you can call any method directly from the connection.
+
 
 ## EventManager
 
-The ```PamiModule``` client has an ```EventManager``` created only when you try to get it.
-When the ```EventManager``` is created, it's attached to the event listener of original PAMI module injected into the client.
-The triggered events  are instances of ```PamiModule\\PamiEvent``` and the name of the event is the class name of original PAMI event without its (```PAMI\Message\Event```) prefix and ```Event``` suffix.
-So, if the original event is an instance of ```PAMI\Message\Event\BridgeEvent```, the name of the event in ```EventManager``` will be ```Bridge```.
-Of course, you can acces to the original event to retrieve event data.
-The event target is the ```PamiModule``` client.
+The ```PamiModule``` client has an ```EventManager``` created only when you try to get it.  
+When the ```EventManager``` is created, it's attached to the event listener of original PAMI module injected into the client.  
+The triggered events  are instances of ```PamiModule\\PamiEvent``` and the name of the event is the class name of original PAMI event without its (```PAMI\Message\Event```) prefix and ```Event``` suffix.  
+So, if the original event is an instance of ```PAMI\Message\Event\BridgeEvent```, the name of the event in ```EventManager``` will be ```Bridge```.  
+Of course, you can acces to the original event to retrieve event data.  
+The event target is the ```PamiModule``` client.  
 
 Example:
 ```php
