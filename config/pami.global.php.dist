@@ -1,0 +1,19 @@
+<?php
+return [
+    'pami_module' => [
+        'connection' => [
+            'default' => [
+                'host' => '',
+                'scheme' => 'tcp://',
+                'port' => 5038,
+                'username' => 'admin',
+                'secret' => '',
+                'connect_timeout' => 30,
+                'read_timeout' => 3000
+            ]
+        ],
+        'client' => [
+            'connection' => 'default'
+        ]
+    ],
+];

@@ -1,0 +1,49 @@
+{
+  "name": "thomasvargiu/pami-module",
+  "description": "ZF2 module for PAMI Asterisk Library",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/thomasvargiu/pami-module",
+  "keywords": [
+    "zf2",
+    "zend framework",
+    "pami",
+    "asterisk",
+    "ami",
+    "asterisk manager interface"
+  ],
+  "authors": [
+    {
+      "name": "Thomas Vargiu",
+      "email": "tvargiu@gmail.com",
+      "homepage": "http://thomasvargiu.com/"
+    }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "marcelog/pami": "~1.7",
+    "zendframework/zend-stdlib": "~2.2",
+    "zendframework/zend-servicemanager": "~2.2",
+    "zendframework/zend-modulemanager": "~2.2",
+    "zendframework/zend-mvc": "~2.2",
+    "zendframework/zend-log": "~2.2"
+  },
+  "require-dev": {
+    "zendframework/zend-test": "~2.2",
+    "phpunit/phpunit": "@stable",
+    "squizlabs/php_codesniffer": "@stable",
+    "phpmd/phpmd" : "@stable",
+    "fabpot/php-cs-fixer": "@stable",
+    "zendframework/zendframework": "~2.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "PamiModule\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PamiModuleTest\\": "test/unit/"
+    }
+  }
+}
