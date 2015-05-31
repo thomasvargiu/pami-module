@@ -33,6 +33,15 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
                         'connect_timeout' => 123,
                         'read_timeout' => 123,
                     ],
+                    'other' => [
+                        'host' => 'local2.host',
+                        'scheme' => 'tcp://',
+                        'port' => 123,
+                        'username' => 'admin',
+                        'secret' => 'foosecret',
+                        'connect_timeout' => 123,
+                        'read_timeout' => 123,
+                    ],
                 ],
                 'client' => [
                     'default' => [
@@ -47,7 +56,12 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
 
         $connectionMock = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
+            ->setMethods(['registerEventListener'])
             ->getMock();
+
+        $connectionMock->expects(static::once())
+            ->method('registerEventListener')
+            ->with(static::isInstanceOf('PamiModule\\Event\\EventForwarder'));
 
         $serviceManager = $this->moduleLoader->getServiceManager();
         $serviceManager->setAllowOverride(true);
@@ -62,5 +76,15 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
 
         static::assertInstanceOf('PamiModule\\Service\\Client', $service);
         static::assertEquals(['foo' => 'bar'], $service->getParams());
+        static::assertInstanceOf('Zend\\EventManager\\EventManager', $service->getEventManager());
+
+        // Test with client not in in configuration
+
+        $factory = new ClientFactory('other');
+        $service = $factory->createService($serviceManager);
+
+        static::assertInstanceOf('PamiModule\\Service\\Client', $service);
+        static::assertEquals([], $service->getParams());
+        static::assertInstanceOf('Zend\\EventManager\\EventManager', $service->getEventManager());
     }
 }

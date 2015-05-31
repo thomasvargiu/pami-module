@@ -2,24 +2,23 @@
 
 namespace PamiModule\Service;
 
+use RuntimeException;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use RuntimeException;
 
 abstract class AbstractFactory implements FactoryInterface
 {
     /**
+     * Service name
+     *
      * @var string
      */
     protected $name;
 
     /**
-     * @var \Zend\Stdlib\AbstractOptions
-     */
-    protected $options;
-
-    /**
-     * @param string $name
+     * Constructor
+     *
+     * @param string $name Service name
      */
     public function __construct($name)
     {
@@ -27,19 +26,11 @@ abstract class AbstractFactory implements FactoryInterface
     }
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * Gets options from configuration based on name.
      *
-     * @param ServiceLocatorInterface $sl
-     * @param string                  $key
-     * @param null|string             $name
+     * @param ServiceLocatorInterface $sl   Service locator
+     * @param string                  $key  Service type
+     * @param null|string             $name Service name
      *
      * @return \Zend\Stdlib\AbstractOptions
      *
@@ -51,12 +42,8 @@ abstract class AbstractFactory implements FactoryInterface
             $name = $this->getName();
         }
 
-        $options = $sl->get('Config');
-        $options = $options['pami_module'];
-        $options = isset($options[$key][$name]) ? $options[$key][$name] : null;
-
-        // @codeCoverageIgnoreStart
-        if (null === $options) {
+        if (!$this->hasOptions($sl, $key, $name)) {
+            // @codeCoverageIgnoreStart
             throw new RuntimeException(
                 sprintf(
                     'Options with name "%s" could not be found in "pami_module.%s".',
@@ -64,12 +51,43 @@ abstract class AbstractFactory implements FactoryInterface
                     $key
                 )
             );
+            // @codeCoverageIgnoreEnd
         }
-        // @codeCoverageIgnoreEnd
+
+        $options = $sl->get('Config');
+        $options = $options['pami_module'];
+        $options = isset($options[$key][$name]) ? $options[$key][$name] : null;
 
         $optionsClass = $this->getOptionsClass();
 
         return new $optionsClass($options);
+    }
+
+    /**
+     * Return if options exists in configuration
+     *
+     * @param ServiceLocatorInterface $sl   Service locator
+     * @param string                  $key  Service type
+     * @param string                  $name Service name
+     *
+     * @return bool
+     */
+    public function hasOptions(ServiceLocatorInterface $sl, $key, $name)
+    {
+        $options = $sl->get('Config');
+        $options = $options['pami_module'];
+
+        return isset($options[$key][$name]);
+    }
+
+    /**
+     * Service name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**

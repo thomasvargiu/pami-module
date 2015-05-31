@@ -2,8 +2,6 @@
 
 namespace PamiModuleTest\Service;
 
-use PAMI\Message\Event\BridgeEvent;
-use PamiModule\PamiEvent;
 use PamiModule\Service\Client;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
@@ -14,60 +12,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $pami->expects(static::exactly(2))
-            ->method('registerEventListener')
-            ->willReturn('uniqueIdFoo');
-
-        $pami->expects(static::once())
-            ->method('unregisterEventListener')
-            ->with('uniqueIdFoo');
+        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+            ->getMock();
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        /* @var \Zend\EventManager\EventManager $eventManager */
 
-        $client = new Client($pami);
+        $client = new Client($pami, $eventManager);
         static::assertSame($pami, $client->getConnection());
 
         // Test attach EventManager
 
         $eventManager = $client->getEventManager();
-        static::assertInstanceOf('Zend\\EventManager\\EventManager', $eventManager);
+        static::assertSame($eventManager, $client->getEventManager());
 
-        // Test unregister
-        /** @var \Zend\EventManager\EventManager $eventManagerMock */
-        $eventManagerMock = static::getMock('Zend\\EventManager\\EventManager');
-
-        $client->setEventManager($eventManagerMock);
-    }
-
-    public function testOnConnectionEvent()
-    {
-        $eventManagerMock = static::getMock('Zend\\EventManager\\EventManager');
-
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
-
-        $client = new Client($pami);
-
-        $incomingMessage = new BridgeEvent('Event: Bridge');
-
-        $eventManagerMock->expects(static::once())
-            ->method('trigger')
-            ->with(static::callback(function (PamiEvent $e) use ($client, $incomingMessage) {
-                static::assertInstanceOf('PamiModule\\PamiEvent', $e);
-                static::assertSame($client, $e->getTarget());
-                static::assertSame($incomingMessage, $e->getEvent());
-
-                return true;
-            }));
-
-        $client->setEventManager($eventManagerMock);
-
-        $method = new \ReflectionMethod('PamiModule\\Service\\Client', 'onConnectionEvent');
-        $method->setAccessible(true);
-
-        $method->invoke($client, $incomingMessage);
+        $params = ['foo' => 'bar'];
+        $client->setParams($params);
+        static::assertEquals($params, $client->getParams());
     }
 }

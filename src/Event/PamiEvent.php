@@ -1,14 +1,16 @@
 <?php
 
-namespace PamiModule;
+namespace PamiModule\Event;
 
 use Zend\EventManager\Event;
-use PAMI\Message\IncomingMessage;
+use PAMI\Message\Event\EventMessage;
 
 class PamiEvent extends Event
 {
     /**
-     * @return IncomingMessage
+     * Get the PAMI event
+     *
+     * @return EventMessage
      */
     public function getEvent()
     {
@@ -16,11 +18,13 @@ class PamiEvent extends Event
     }
 
     /**
-     * @param IncomingMessage $event
+     * Set the PAMI event
+     *
+     * @param EventMessage $event PAMI event
      *
      * @return $this
      */
-    public function setEvent(IncomingMessage $event)
+    public function setEvent(EventMessage $event)
     {
         $this->setParam('event', $event);
 

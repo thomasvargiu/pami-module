@@ -7,15 +7,21 @@ use Zend\Stdlib\AbstractOptions;
 class Client extends AbstractOptions
 {
     /**
+     * Connection name
+     *
      * @var string
      */
     protected $connection;
     /**
+     * Custom params
+     *
      * @var array
      */
     protected $params = [];
 
     /**
+     * Connection name
+     *
      * @return string
      */
     public function getConnection()
@@ -24,7 +30,9 @@ class Client extends AbstractOptions
     }
 
     /**
-     * @param string $connection
+     * Set the connection name
+     *
+     * @param string $connection Connection name
      *
      * @return $this
      */
@@ -36,6 +44,8 @@ class Client extends AbstractOptions
     }
 
     /**
+     * Custom params
+     *
      * @return array
      */
     public function getParams()
@@ -44,7 +54,9 @@ class Client extends AbstractOptions
     }
 
     /**
-     * @param array $params
+     * Set the custom parameters
+     *
+     * @param array $params Parameters
      *
      * @return $this
      */

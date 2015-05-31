@@ -4,6 +4,8 @@ namespace PamiModule\Service;
 
 use PAMI\Client\Impl\ClientImpl;
 use PamiModule\Options\Client as ClientOptions;
+use PamiModule\Event\EventForwarder;
+use Zend\EventManager\EventManager;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 class ClientFactory extends AbstractFactory
@@ -27,16 +29,29 @@ class ClientFactory extends AbstractFactory
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /** @var ClientOptions $options */
-        $options = $this->getOptions($serviceLocator, 'client');
+        $options = null;
+        $connectionName = $this->getName();
 
-        $connectionName = $options->getConnection() ?: $this->getName();
+        if ($this->hasOptions($serviceLocator, 'client', $this->getName())) {
+            /** @var ClientOptions $options */
+            $options = $this->getOptions($serviceLocator, 'client');
+            $connectionName = $options->getConnection() ?: $this->getName();
+        }
 
         /** @var ClientImpl $connection */
         $connection = $serviceLocator->get(sprintf('pami.connection.%s', $connectionName));
 
-        $client = new Client($connection);
-        $client->setParams($options->getParams());
+        $eventManager = new EventManager();
+
+        $client = new Client($connection, $eventManager);
+        $eventManager->setIdentifiers(get_class($client));
+
+        if ($options) {
+            $client->setParams($options->getParams());
+        }
+
+        $eventForwarder = new EventForwarder($client);
+        $client->getConnection()->registerEventListener($eventForwarder);
 
         return $client;
     }
