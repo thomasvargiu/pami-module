@@ -24,7 +24,7 @@ return [
                 'secret' => 'secret', // Password for asterisk AMI
                 'scheme' => 'tcp://', // (optional) Connection scheme (default: tcp://)
                 'connect_timeout' => 10000, // (optional) Connection timeout in ms (default: 10000)
-                'read_timeout' => 10000 // Read timeout in ms (default: 10000)
+                'read_timeout' => 10000 // (optional) Read timeout in ms (default: 10000)
             ]
         ],
         'client' => [
