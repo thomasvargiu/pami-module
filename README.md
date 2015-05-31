@@ -6,7 +6,10 @@ A ZF2 module for [PAMI](https://github.com/marcelog/PAMI) library.
 [![Code Coverage](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/?branch=master)
 [![Dependency Status](https://www.versioneye.com/user/projects/556a836563653200265f1600/badge.svg?style=flat)](https://www.versioneye.com/user/projects/556a836563653200265f1600)
-
+[![Latest Stable Version](https://poser.pugx.org/thomasvargiu/pami-module/v/stable)](https://packagist.org/packages/thomasvargiu/pami-module)
+[![Total Downloads](https://poser.pugx.org/thomasvargiu/pami-module/downloads)](https://packagist.org/packages/thomasvargiu/pami-module)
+[![Latest Unstable Version](https://poser.pugx.org/thomasvargiu/pami-module/v/unstable)](https://packagist.org/packages/thomasvargiu/pami-module)
+[![License](https://poser.pugx.org/thomasvargiu/pami-module/license)](https://packagist.org/packages/thomasvargiu/pami-module)
 
 ## Configuration
 
