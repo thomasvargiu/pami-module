@@ -9,14 +9,14 @@ use Zend\ServiceManager\ServiceLocatorInterface;
 abstract class AbstractFactory implements FactoryInterface
 {
     /**
-     * Service name
+     * Service name.
      *
      * @var string
      */
     protected $name;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $name Service name
      */
@@ -64,7 +64,7 @@ abstract class AbstractFactory implements FactoryInterface
     }
 
     /**
-     * Return if options exists in configuration
+     * Return if options exists in configuration.
      *
      * @param ServiceLocatorInterface $sl   Service locator
      * @param string                  $key  Service type
@@ -81,7 +81,7 @@ abstract class AbstractFactory implements FactoryInterface
     }
 
     /**
-     * Service name
+     * Service name.
      *
      * @return string
      */

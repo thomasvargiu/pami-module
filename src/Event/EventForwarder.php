@@ -9,6 +9,8 @@ use PamiModule\Service\Client;
 class EventForwarder implements IEventListener
 {
     /**
+     * PamiModule client.
+     *
      * @var Client
      */
     protected $client;
@@ -16,7 +18,7 @@ class EventForwarder implements IEventListener
     /**
      * EventForwarder constructor.
      *
-     * @param Client $client
+     * @param Client $client PamiModule client
      */
     public function __construct(Client $client)
     {
@@ -26,7 +28,7 @@ class EventForwarder implements IEventListener
     /**
      * Forward PAMI event to EventManager.
      *
-     * @param EventMessage $e
+     * @param EventMessage $e PAMI event
      */
     public function handle(EventMessage $e)
     {

@@ -8,7 +8,7 @@ use PAMI\Message\Event\EventMessage;
 class PamiEvent extends Event
 {
     /**
-     * Get the PAMI event
+     * Get the PAMI event.
      *
      * @return EventMessage
      */
@@ -18,7 +18,7 @@ class PamiEvent extends Event
     }
 
     /**
-     * Set the PAMI event
+     * Set the PAMI event.
      *
      * @param EventMessage $event PAMI event
      *

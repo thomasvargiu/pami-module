@@ -9,13 +9,22 @@ use Zend\Log\Logger;
 class LogAppender extends \LoggerAppender
 {
     /**
+     * ZF logger.
+     *
      * @var Logger
      */
     protected $zendLog;
 
+    /**
+     * Tell that the log appender doesn't require a layout.
+     *
+     * @var bool
+     */
     protected $requiresLayout = false;
 
     /**
+     * Return the ZF logger.
+     *
      * @return Logger
      */
     public function getZendLog()
@@ -24,7 +33,9 @@ class LogAppender extends \LoggerAppender
     }
 
     /**
-     * @param Logger $zendLog
+     * Set the ZF logger.
+     *
+     * @param Logger $zendLog Logger
      *
      * @return $this
      */
@@ -40,7 +51,7 @@ class LogAppender extends \LoggerAppender
      *
      * Derived appenders should implement this method to perform actual logging.
      *
-     * @param LoggerLoggingEvent $event
+     * @param LoggerLoggingEvent $event Logger event
      */
     public function append(LoggerLoggingEvent $event)
     {

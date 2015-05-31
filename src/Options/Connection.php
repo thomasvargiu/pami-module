@@ -9,35 +9,51 @@ class Connection extends AbstractOptions
     const SCHEME_TCP = 'tcp://';
 
     /**
+     * Hostname.
+     *
      * @var string
      */
     protected $host;
     /**
+     * Connection scheme.
+     *
      * @var string
      */
     protected $scheme = 'tcp://';
     /**
+     * Connection port.
+     *
      * @var int
      */
     protected $port = 5038;
     /**
+     * Username.
+     *
      * @var string
      */
     protected $username;
     /**
+     * Password.
+     *
      * @var string
      */
     protected $secret;
     /**
+     * Connection timeout.
+     *
      * @var int
      */
     protected $connectTimeout = 10000;
     /**
+     * Read timeout.
+     *
      * @var int
      */
     protected $readTimeout = 10000;
 
     /**
+     * Return the host.
+     *
      * @return string
      */
     public function getHost()
@@ -46,7 +62,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param string $host
+     * Set the host.
+     *
+     * @param string $host IP address or hostname
      *
      * @return $this
      */
@@ -58,6 +76,8 @@ class Connection extends AbstractOptions
     }
 
     /**
+     * Return the connection scheme.
+     *
      * @return string
      */
     public function getScheme()
@@ -66,7 +86,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param string $scheme
+     * Set the connection scheme.
+     *
+     * @param string $scheme Connection scheme
      *
      * @return $this
      */
@@ -78,6 +100,8 @@ class Connection extends AbstractOptions
     }
 
     /**
+     * Return the connection port.
+     *
      * @return int
      */
     public function getPort()
@@ -86,7 +110,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param int $port
+     * Set the connection port.
+     *
+     * @param int $port Connection port
      *
      * @return $this
      */
@@ -98,6 +124,8 @@ class Connection extends AbstractOptions
     }
 
     /**
+     * Get the username.
+     *
      * @return string
      */
     public function getUsername()
@@ -106,7 +134,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param string $username
+     * Set the username.
+     *
+     * @param string $username Username
      *
      * @return $this
      */
@@ -118,6 +148,8 @@ class Connection extends AbstractOptions
     }
 
     /**
+     * Return the password.
+     *
      * @return string
      */
     public function getSecret()
@@ -126,7 +158,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param string $secret
+     * Set the password.
+     *
+     * @param string $secret Password
      *
      * @return $this
      */
@@ -138,6 +172,8 @@ class Connection extends AbstractOptions
     }
 
     /**
+     * Get the connection timeout in ms.
+     *
      * @return int
      */
     public function getConnectTimeout()
@@ -146,7 +182,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param int $connectTimeout
+     * Set the connection timeout.
+     *
+     * @param int $connectTimeout Connection timeout in ms
      *
      * @return $this
      */
@@ -158,6 +196,8 @@ class Connection extends AbstractOptions
     }
 
     /**
+     * Return the read timeout in ms.
+     *
      * @return int
      */
     public function getReadTimeout()
@@ -166,7 +206,9 @@ class Connection extends AbstractOptions
     }
 
     /**
-     * @param int $readTimeout
+     * Set the read timeout.
+     *
+     * @param int $readTimeout Read timeout in ms
      *
      * @return $this
      */

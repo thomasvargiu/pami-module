@@ -9,6 +9,7 @@ class Module implements ConfigProviderInterface, AutoloaderProviderInterface
 {
     /**
      * {@inheritDoc}
+     *
      * @return array
      */
     public function getConfig()
@@ -18,6 +19,7 @@ class Module implements ConfigProviderInterface, AutoloaderProviderInterface
 
     /**
      * {@inheritDoc}
+     *
      * @return array
      */
     public function getAutoloaderConfig()

@@ -23,7 +23,7 @@ class ClientFactory extends AbstractFactory
     /**
      * Create service.
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ServiceLocatorInterface $serviceLocator Service locator
      *
      * @return Client
      */

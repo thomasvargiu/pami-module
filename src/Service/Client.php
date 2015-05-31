@@ -9,14 +9,20 @@ use Zend\EventManager\EventsCapableInterface;
 class Client implements EventsCapableInterface
 {
     /**
+     * PAMI client.
+     *
      * @var ClientImpl
      */
     protected $connection;
     /**
+     * Custom parameters.
+     *
      * @var array
      */
     protected $params = [];
     /**
+     * Event manager.
+     *
      * @var EventManagerInterface
      */
     protected $eventManager;
@@ -24,16 +30,20 @@ class Client implements EventsCapableInterface
     /**
      * Client constructor.
      *
-     * @param ClientImpl            $pami
-     * @param EventManagerInterface $eventManager
+     * @param ClientImpl            $pami         PAMI client
+     * @param EventManagerInterface $eventManager EventManager
      */
-    public function __construct(ClientImpl $pami, EventManagerInterface $eventManager)
-    {
+    public function __construct(
+        ClientImpl $pami,
+        EventManagerInterface $eventManager
+    ) {
         $this->connection = $pami;
         $this->eventManager = $eventManager;
     }
 
     /**
+     * Return the PAMI client.
+     *
      * @return ClientImpl
      */
     public function getConnection()
@@ -42,6 +52,8 @@ class Client implements EventsCapableInterface
     }
 
     /**
+     * Return the EventManager.
+     *
      * @return EventManagerInterface
      */
     public function getEventManager()
@@ -50,6 +62,8 @@ class Client implements EventsCapableInterface
     }
 
     /**
+     * Return the custom parameters.
+     *
      * @return array
      */
     public function getParams()
@@ -58,7 +72,9 @@ class Client implements EventsCapableInterface
     }
 
     /**
-     * @param array $params
+     * Set the custom parameters.
+     *
+     * @param array $params Parameters
      *
      * @return $this
      */
