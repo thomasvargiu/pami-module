@@ -54,6 +54,18 @@ class ConnectionFactory extends AbstractFactory
             'scheme' => $options->getScheme(),
         ];
 
+        // Disable loggin
+        $clientOptions['log4php.properties'] = [
+            'rootLogger' => [
+                'appenders' => ['default']
+            ],
+            'appenders' => [
+                'default' => [
+                    'class' => 'LoggerAppenderNull'
+                ]
+            ]
+        ];
+
         /** @var ClientImpl $pami */
         $pami = new ClientImpl($clientOptions);
 
