@@ -27,6 +27,9 @@ return [
                 'read_timeout' => 10000 // (optional) Read timeout in ms (default: 10000)
             ]
         ],
+        'client' => [
+            'default' => []
+        ]
     ]
 ]
 ```
@@ -96,6 +99,10 @@ return [
                 // configuration
             ]
         ],
+        'client' => [
+            'default' => [],
+            'asterisk2 => []
+        ]
     ]
 ]
 ```
