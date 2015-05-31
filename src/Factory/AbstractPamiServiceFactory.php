@@ -33,7 +33,8 @@ class AbstractPamiServiceFactory implements AbstractFactoryInterface
      *
      * @return bool|array
      */
-    private function getFactoryMapping(ServiceLocatorInterface $serviceLocator, $name) {
+    private function getFactoryMapping(ServiceLocatorInterface $serviceLocator, $name)
+    {
         $matches = [];
 
         if (!preg_match('/^pami\.(?P<serviceType>[a-z0-9_]+)\.(?P<serviceName>[a-z0-9_]+)$/', $name, $matches)) {
@@ -44,7 +45,8 @@ class AbstractPamiServiceFactory implements AbstractFactoryInterface
         $serviceType = $matches['serviceType'];
         $serviceName = $matches['serviceName'];
 
-        if (!isset($config['pami_module_factories'][$serviceType], $config['pami_module'][$serviceType][$serviceName])) {
+        if (!isset($config['pami_module_factories'][$serviceType]) ||
+            !isset($config['pami_module'][$serviceType][$serviceName])) {
             return false;
         }
 
