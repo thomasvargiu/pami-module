@@ -1,4 +1,5 @@
-# PamiModule
+PamiModule
+==========
 
 A ZF2 module for [PAMI](https://github.com/marcelog/PAMI) library.
 
@@ -11,7 +12,10 @@ A ZF2 module for [PAMI](https://github.com/marcelog/PAMI) library.
 [![Latest Unstable Version](https://poser.pugx.org/thomasvargiu/pami-module/v/unstable)](https://packagist.org/packages/thomasvargiu/pami-module)
 [![License](https://poser.pugx.org/thomasvargiu/pami-module/license)](https://packagist.org/packages/thomasvargiu/pami-module)
 
-## Configuration
+Configuration
+-------------
+
+First, you should define connection and clients options in your configuration. Client options are all optional.
 
 ```php
 return [
@@ -35,13 +39,13 @@ return [
 ```
 
 Then you can retrieve two services from the service locator:
-- ```pami.connection.default```: PAMI original client
 - ```pami.client.default```: PamiModule client
 
 
-## PamiModule Client
+PamiModule Client
+-----------------
 
-The original ```Pami``` client (the connection) is injected into the ```PamiModule``` client as connection, and you can access to it:
+You can get the client from the service locator.
 
 ```php
 use PamiModule\Service\Client;
@@ -50,18 +54,43 @@ use PAMI\Client\Impl\ClientImpl;
 // Getting the PamiModule client
 /** @var Client $client */
 $client = $serviceLocator->get('pami.client.default');
-// Getting the PAMI client
-/** @var ClientImpl $connection */
-$connection = $client->getConnection();
 ```
 
-Then you can call any method directly from the connection.
+
+### Methods
+
+The original ```Pami``` client (the connection) is injected into the ```PamiModule```, and the ```PamiModule``` actions 
+delegates the original client.
+
+*Mapped Actions:*
+
+| PamiModule         | PAMI            |
+|--------------------|-----------------|
+| ```connect()```    | ```open()```    |
+| ```disconnect()``` | ```close()```   |
+| ```sendAction()``` | ```send()```    |
+| ```process()```    | ```process()``` |
 
 
-## EventManager
+### Events
 
-The ```PamiModule``` client has an ```EventManager``` instance injected.  
-All PAMI events are forwarded to this event manager that will trigger an event (```PamiModule\Event\PamiEvent```).  
+The ```PamiModule``` client has an ```EventManager``` instance injected into it.  
+The following methods will trigger events with the same name of the method and  ```.pre``` and ```.post``` suffix:
+ 
+- ```connect()```
+- ```disconnect()```
+- ```process()```
+- ```sendAction()```
+
+The ```sendAction()``` events have ```action``` param in ```sendAction.pre``` event
+and ```action``` and ```response``` params in ```sendAction.post``` event, allowing you to modify the action before it
+will be dispatched or to cache responses.
+
+
+PAMI events
+-----------
+ 
+All PAMI events are forwarded to the event manager that will trigger an event (```PamiModule\Event\PamiEvent```).  
 The name of the event will be ```event.<name>``` (example: ```event.ExtensionStatus```).  
 Of course, you can acces to the original event to retrieve event data (see example below).  
 The event target is the ```PamiModule``` client.  
@@ -86,7 +115,8 @@ $client->getEventManager()->attach('event.Bridge', function(PamiEvent $event) {
 ```
 
 
-## Multiple client
+Multiple clients
+----------------
 
 ```php
 return [
@@ -114,7 +144,7 @@ You can retrieve connections and clients:
 - ```pami.client.asterisk2```
 
 
-### Multiple client sharing the same connection
+### Multiple clients sharing the same connection
 
 You can create another client with the same connection of another one:
 
@@ -145,26 +175,29 @@ $client2 = $serviceLocator->get('pami.client.client2');
 $client1->getConnection() === $client2->getConnection(); // true
 ```
 
-### Passing custom data to clients
 
-Sometimes you need to have some information about the client or connection (sometimes you need them in listeners).
+Getting the original PAMI client
+--------------------------------
 
+You can retrieve the original PAMI client in two ways:
+
+From service locator:
 ```php
-return [
-    'pami_module' => [
-        // ...
-        'client' => [
-            'default' => [
-                'params' => [
-                    'host' => 'host.domain.com'
-                ]
-            ],
-        ]
-    ]
-]
+use PAMI\Client\Impl\ClientImpl;
+
+/** @var ClientImpl $connection */
+$connection = $serviceLocator->get('pami.connection.default');
 ```
 
+From the ```PamiModule``` client:
 ```php
+use PamiModule\Service\Client;
+use PAMI\Client\Impl\ClientImpl;
+
+// Getting the PamiModule client
+/** @var Client $client */
 $client = $serviceLocator->get('pami.client.default');
-$params = $client->getParams(); // ['host' => 'host.domain.com'] 
+// Getting the PAMI client
+/** @var ClientImpl $connection */
+$connection = $client->getConnection();
 ```

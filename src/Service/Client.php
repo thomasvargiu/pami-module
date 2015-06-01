@@ -3,8 +3,10 @@
 namespace PamiModule\Service;
 
 use PAMI\Client\Impl\ClientImpl;
+use PAMI\Message\OutgoingMessage;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\EventsCapableInterface;
+use Zend\Stdlib\ArrayObject;
 
 class Client implements EventsCapableInterface
 {
@@ -26,19 +28,33 @@ class Client implements EventsCapableInterface
      * @var EventManagerInterface
      */
     protected $eventManager;
+    /**
+     * @var string
+     */
+    protected $host;
 
     /**
      * Client constructor.
      *
+     * @param string                $host
      * @param ClientImpl            $pami         PAMI client
      * @param EventManagerInterface $eventManager EventManager
      */
-    public function __construct(
-        ClientImpl $pami,
-        EventManagerInterface $eventManager
-    ) {
+    public function __construct($host, ClientImpl $pami, EventManagerInterface $eventManager)
+    {
+        $this->host = $host;
         $this->connection = $pami;
         $this->eventManager = $eventManager;
+    }
+
+    /**
+     * Return the hostname of the connection.
+     *
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
     }
 
     /**
@@ -83,5 +99,79 @@ class Client implements EventsCapableInterface
         $this->params = $params;
 
         return $this;
+    }
+
+    /**
+     * Connect to the Asterisk Manager Interface.
+     *
+     * @return $this
+     *
+     * @throws \PAMI\Client\Exception\ClientException
+     */
+    public function connect()
+    {
+        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+
+        $this->connection->open();
+
+        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this);
+
+        return $this;
+    }
+
+    /**
+     * Disconnect from the Asterisk Manager Interface.
+     *
+     * @return $this
+     */
+    public function disconnect()
+    {
+        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+
+        $this->connection->close();
+
+        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this);
+
+        return $this;
+    }
+
+    /**
+     * Main processing loop. Also called from send(), you should call this in
+     * your own application in order to continue reading events and responses
+     * from ami.
+     *
+     * @return $this
+     */
+    public function process()
+    {
+        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+
+        $this->connection->process();
+
+        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this);
+
+        return $this;
+    }
+
+    /**
+     * Sends a message to AMI.
+     *
+     * @param OutgoingMessage $action Action to send
+     *
+     * @return \PAMI\Message\Response\ResponseMessage
+     *
+     * @throws \PAMI\Client\Exception\ClientException
+     */
+    public function sendAction(OutgoingMessage $action)
+    {
+        $params = new ArrayObject(['action' => $action]);
+        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this, $params);
+
+        $response = $this->connection->send($action);
+
+        $params['response'] = $response;
+        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this, $params);
+
+        return $response;
     }
 }
