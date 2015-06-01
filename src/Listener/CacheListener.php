@@ -184,6 +184,6 @@ class CacheListener implements ListenerAggregateInterface
         ksort($keys);
         ksort($variables);
 
-        return $prefix.md5(json_encode(array_merge($keys, $variables)));
+        return md5($prefix.json_encode(array_merge($keys, $variables)));
     }
 }
