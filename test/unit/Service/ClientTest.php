@@ -282,14 +282,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                 'sendAction.pre',
                 $client,
                 static::isInstanceOf('Zend\\Stdlib\\ArrayObject'),
-                static::callback(function ($callback) use ($response) {
-                    static::assertFalse($callback(null));
-                    static::assertFalse($callback('string'));
-                    static::assertFalse($callback([]));
-                    static::assertTrue($callback($response));
+                static::callback(
+                    function ($callback) use ($response) {
+                        static::assertFalse($callback(null));
+                        static::assertFalse($callback('string'));
+                        static::assertFalse($callback([]));
+                        static::assertTrue($callback($response));
 
-                    return true;
-                })
+                        return true;
+                    }
+                )
             )
             ->willReturn($eventResults);
 
