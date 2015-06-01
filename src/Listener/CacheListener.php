@@ -181,8 +181,8 @@ class CacheListener implements ListenerAggregateInterface
         $keys = array_diff_key($keys, array_flip($removeKeys));
         $variables = $action->getVariables();
         $variables = is_array($variables) ? $variables : [];
-        asort($keys);
-        asort($variables);
+        ksort($keys);
+        ksort($variables);
 
         return $prefix.md5(json_encode(array_merge($keys, $variables)));
     }
