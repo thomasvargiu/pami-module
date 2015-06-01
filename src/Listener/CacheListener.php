@@ -177,8 +177,10 @@ class CacheListener implements ListenerAggregateInterface
     protected function generateCacheId(OutgoingMessage $action, $prefix = '')
     {
         $removeKeys = ['actionid'];
-        $keys = array_diff_key($action->getKeys(), array_flip($removeKeys));
+        $keys = $action->getKeys();
+        $keys = array_diff_key($keys, array_flip($removeKeys));
         $variables = $action->getVariables();
+        $variables = is_array($variables) ? $variables : [];
         asort($keys);
         asort($variables);
 
