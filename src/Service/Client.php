@@ -4,6 +4,7 @@ namespace PamiModule\Service;
 
 use PAMI\Client\Impl\ClientImpl;
 use PAMI\Message\OutgoingMessage;
+use PAMI\Message\Response\ResponseMessage;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\EventsCapableInterface;
 use Zend\Stdlib\ArrayObject;
@@ -110,7 +111,10 @@ class Client implements EventsCapableInterface
      */
     public function connect()
     {
-        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        if ($results->stopped()) {
+            return $this;
+        }
 
         $this->connection->open();
 
@@ -126,7 +130,10 @@ class Client implements EventsCapableInterface
      */
     public function disconnect()
     {
-        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        if ($results->stopped()) {
+            return $this;
+        }
 
         $this->connection->close();
 
@@ -144,7 +151,10 @@ class Client implements EventsCapableInterface
      */
     public function process()
     {
-        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        if ($results->stopped()) {
+            return $this;
+        }
 
         $this->connection->process();
 
@@ -165,7 +175,12 @@ class Client implements EventsCapableInterface
     public function sendAction(OutgoingMessage $action)
     {
         $params = new ArrayObject(['action' => $action]);
-        $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this, $params);
+        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this, $params, function ($response) {
+            return $response instanceof ResponseMessage;
+        });
+        if ($results->stopped()) {
+            return $results->last();
+        }
 
         $response = $this->connection->send($action);
 

@@ -101,15 +101,15 @@ Example:
 use PamiModule\Service\Client;
 use PamiModule\Event\PamiEvent;
 
-/** @var Client $client */
+/* @var Client $client */
 $client = $serviceLocator->get('pami.client.default');
 $client->getEventManager()->attach('event.Bridge', function(PamiEvent $event) {
     // Getting the client
-    /** @var Client $client */
+    /* @var Client $client */
     $client = $event->getTarget();
     
     // Getting the original Event
-    /** @var \PAMI\Message\Event\BridgeEvent $pamiEvent */
+    /* @var \PAMI\Message\Event\BridgeEvent $pamiEvent */
     $pamiEvent = $event->getEvent();
 });
 ```
@@ -185,7 +185,7 @@ From service locator:
 ```php
 use PAMI\Client\Impl\ClientImpl;
 
-/** @var ClientImpl $connection */
+/* @var ClientImpl $connection */
 $connection = $serviceLocator->get('pami.connection.default');
 ```
 
@@ -195,9 +195,66 @@ use PamiModule\Service\Client;
 use PAMI\Client\Impl\ClientImpl;
 
 // Getting the PamiModule client
-/** @var Client $client */
+/* @var Client $client */
 $client = $serviceLocator->get('pami.client.default');
 // Getting the PAMI client
-/** @var ClientImpl $connection */
+/* @var ClientImpl $connection */
 $connection = $client->getConnection();
+```
+
+
+Available Listeners
+-------------------
+
+There are listeners ready to be used.
+
+- ```PamiModule\\Listener\\ConnectionStatusListener```
+- ```PamiModule\\Listener\\CacheListener```
+
+
+### ConnectionStatusListener
+
+This listener takes care to maintain a connection status, and to call ```connect()``` method when is required.  
+It can be useful when you share the client between some services, because you don't need to call ```connect()``` methods
+without to know the connection status. You can call directly ```process()``` and ```sendAction()``` methods and it will 
+automatically calls ```connect()``` if a connection is not already opened.  
+You can also use ```connect()``` and ```disconnect()``` methods at any point of your application, the listener takes 
+care to open or close connection only if is really necessary.  
+In order to use this listener, you can't use the connection (the original ```PAMI``` client) directly, because the connection 
+status is maintained listening the ```PamiModule``` client events.
+
+If you want to use the listener in multiple clients, you need to attach a new instance of it for every client.
+
+You have to attach it to the client before to call any methods, so the best way is to use a delegator factory.  
+This library provide a ready to use delegator factory:
+
+```php
+return [
+    'service_manager' => [
+        'delegators' => [
+            'pami.client.default' => [
+                'PamiModule\\Service\\ConnectionStatusDelegatorFactory'
+            ]
+        ]
+    ]
+];
+```
+
+
+### CacheListener
+
+You can use the CacheListener to cache results of some actions.
+
+```php
+use PamiModule\Listener\CacheListener;
+use Zend\Cache\Storage\StorageInterface;
+
+$client = $serviceLocator->get('pami.client.default')
+/* @var StorageInterface $cache */
+$cache = $serviceLocator->get('asterisk_sippeers_cache');
+
+$actionsToCache = ['SIPPeers', 'ShowPeer'];
+$cacheListener = new CacheListener($cache, $actionsToCache);
+
+$client->getEventManager()->attachAggregate($cacheListener);
 ```
