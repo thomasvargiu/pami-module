@@ -15,7 +15,7 @@ A ZF2 module for [PAMI](https://github.com/marcelog/PAMI) library.
 Configuration
 -------------
 
-First, you should define connection and clients options in your configuration. Client options are all optional.
+First, you should define connection and client options in your configuration. Client options are all optional.
 
 ```php
 return [
@@ -137,10 +137,8 @@ return [
 ]
 ```
 
-You can retrieve connections and clients:
-- ```pami.connection.default```
+You can retrieve clients with service names:
 - ```pami.client.default```
-- ```pami.connection.asterisk2```
 - ```pami.client.asterisk2```
 
 
@@ -208,8 +206,8 @@ Available Listeners
 
 There are listeners ready to be used.
 
-- ```PamiModule\\Listener\\ConnectionStatusListener```
-- ```PamiModule\\Listener\\CacheListener```
+- ```PamiModule\Listener\ConnectionStatusListener```
+- ```PamiModule\Listener\CacheListener```
 
 
 ### ConnectionStatusListener
@@ -225,7 +223,7 @@ status is maintained listening the ```PamiModule``` client events.
 
 If you want to use the listener in multiple clients, you need to attach a new instance of it for every client.
 
-You have to attach it to the client before to call any methods, so the best way is to use a delegator factory.  
+You have to attach it to the client before to call any methods, so the best way is to use a delegator factory. 
 This library provide a ready to use delegator factory:
 
 ```php
@@ -240,10 +238,13 @@ return [
 ];
 ```
 
+Note: if you share some connection between clients, you must attach the same listener to the clients, so you need to 
+create your custom DelegatorFactory.
 
 ### CacheListener
 
 You can use the CacheListener to cache results of some actions.
+The constructor require a cache storage instance and the action names that listener can cache response. 
 
 ```php
 use PamiModule\Listener\CacheListener;
