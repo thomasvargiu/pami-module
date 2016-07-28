@@ -3,6 +3,7 @@
 namespace PamiModuleTest\Service;
 
 use PamiModule\Service\Client;
+use Zend\EventManager\Event;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -227,7 +228,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger', 'triggerUntil'])
+            ->setMethods(['trigger', 'triggerEventUntil'])
             ->getMock();
 
         $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
@@ -248,8 +249,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setEventManager($eventManager);
 
         $eventManager->expects(static::exactly(1))
-            ->method('triggerUntil')
-            ->with(static::isType('callable'), 'sendAction.pre', $client, static::isInstanceOf('ArrayObject'))
+            ->method('triggerEventUntil')
+            ->with(static::isType('callable'), static::isInstanceOf(Event::class))
             ->willReturn($eventResults);
 
         $eventManager->expects(static::exactly(1))
@@ -268,7 +269,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['triggerUntil'])
+            ->setMethods(['triggerEventUntil'])
             ->getMock();
 
         $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
@@ -286,22 +287,18 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client('host', $pami);
         $client->setEventManager($eventManager);
 
-        $eventManager->expects(static::once())
-            ->method('triggerUntil')
-            ->with(
-                static::callback(
-                    function ($callback) use ($response) {
-                        static::assertFalse($callback(null));
-                        static::assertFalse($callback('string'));
-                        static::assertFalse($callback([]));
-                        static::assertTrue($callback($response));
+        $eventManager->expects(static::exactly(1))
+            ->method('triggerEventUntil')
+            ->with(static::callback(
+                function ($callback) use ($response) {
+                    static::assertFalse($callback(null));
+                    static::assertFalse($callback('string'));
+                    static::assertFalse($callback([]));
+                    static::assertTrue($callback($response));
 
-                        return true;
-                    }
-                ),
-                'sendAction.pre',
-                $client,
-                static::isInstanceOf('ArrayObject')
+                    return true;
+                }
+            ), static::isInstanceOf(Event::class)
             )
             ->willReturn($eventResults);
 

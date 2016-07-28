@@ -5,6 +5,7 @@ namespace PamiModule\Service;
 use PAMI\Client\Impl\ClientImpl;
 use PAMI\Message\OutgoingMessage;
 use PAMI\Message\Response\ResponseMessage;
+use Zend\EventManager\Event;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\EventManager\EventsCapableInterface;
 use ArrayObject;
@@ -163,13 +164,12 @@ class Client implements EventsCapableInterface
     public function sendAction(OutgoingMessage $action)
     {
         $params = new ArrayObject(['action' => $action]);
-        $results = $this->getEventManager()->triggerUntil(
+        $event = new Event(__FUNCTION__.'.pre', $this, $params);
+        $results = $this->getEventManager()->triggerEventUntil(
             function ($response) {
                 return $response instanceof ResponseMessage;
             },
-            __FUNCTION__.'.pre',
-            $this,
-            $params
+            $event
         );
         if ($results->stopped()) {
             return $results->last();

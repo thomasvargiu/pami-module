@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.4.1 - 2016-07-28
+### Added
+- Nothing
+
+### Changed
+- Nothing
+
+## Fixed
+- Fix triggerUntil sign allowing zend-eventmanager v2
+
+### Removed
+- Nothing
+
 
 ## 0.4.0 - 2016-07-28
 ### Added
