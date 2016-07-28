@@ -7,9 +7,7 @@ use PAMI\Message\Event\EventMessage;
 use PamiModule\Service\Client;
 
 /**
- * Class EventForwarder
- *
- * @package PamiModule\Event
+ * Class EventForwarder.
  */
 class EventForwarder implements IEventListener
 {

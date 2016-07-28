@@ -6,14 +6,12 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
 /**
- * Class Module
- *
- * @package PamiModule
+ * Class Module.
  */
 class Module implements ConfigProviderInterface, AutoloaderProviderInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @return array
      */
@@ -23,7 +21,7 @@ class Module implements ConfigProviderInterface, AutoloaderProviderInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @return array
      */

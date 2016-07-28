@@ -8,9 +8,7 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\ListenerAggregateTrait;
 
 /**
- * Class ConnectionStatusListener
- *
- * @package PamiModule\Listener
+ * Class ConnectionStatusListener.
  */
 class ConnectionStatusListener implements ListenerAggregateInterface
 {
@@ -28,7 +26,7 @@ class ConnectionStatusListener implements ListenerAggregateInterface
      * implementation will pass this to the aggregate.
      *
      * @param EventManagerInterface $events
-     * @param int $priority
+     * @param int                   $priority
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {

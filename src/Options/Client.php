@@ -5,9 +5,7 @@ namespace PamiModule\Options;
 use Zend\Stdlib\AbstractOptions;
 
 /**
- * Class Client
- *
- * @package PamiModule\Options
+ * Class Client.
  */
 class Client extends AbstractOptions
 {

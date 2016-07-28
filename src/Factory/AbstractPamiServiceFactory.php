@@ -10,17 +10,16 @@ use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
- * Class AbstractPamiServiceFactory
- *
- * @package PamiModule\Factory
+ * Class AbstractPamiServiceFactory.
  */
 class AbstractPamiServiceFactory implements AbstractFactoryInterface
 {
     /**
      * Can the factory create an instance for the service?
      *
-     * @param  ContainerInterface $container
-     * @param  string             $requestedName
+     * @param ContainerInterface $container
+     * @param string             $requestedName
+     *
      * @return bool
      */
     public function canCreate(ContainerInterface $container, $requestedName)
@@ -29,16 +28,18 @@ class AbstractPamiServiceFactory implements AbstractFactoryInterface
     }
 
     /**
-     * Create an object
+     * Create an object.
      *
-     * @param  ContainerInterface $container
-     * @param  string             $requestedName
-     * @param  null|array         $options
+     * @param ContainerInterface $container
+     * @param string             $requestedName
+     * @param null|array         $options
+     *
      * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
+     *
+     * @throws ServiceNotFoundException   if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
+     *                                    creating a service.
+     * @throws ContainerException         if any other error occurs
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

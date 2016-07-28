@@ -9,9 +9,7 @@ use PamiModule\Options\Connection as ConnectionOptions;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
- * Class ConnectionFactory
- *
- * @package PamiModule\Service
+ * Class ConnectionFactory.
  */
 class ConnectionFactory extends AbstractFactory
 {
@@ -29,7 +27,9 @@ class ConnectionFactory extends AbstractFactory
      * @param ContainerInterface $container
      * @param string             $requestedName
      * @param array|null         $options
+     *
      * @return ClientImpl
+     *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */

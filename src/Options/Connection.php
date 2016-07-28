@@ -5,9 +5,7 @@ namespace PamiModule\Options;
 use Zend\Stdlib\AbstractOptions;
 
 /**
- * Class Connection
- *
- * @package PamiModule\Options
+ * Class Connection.
  */
 class Connection extends AbstractOptions
 {

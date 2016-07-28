@@ -10,9 +10,7 @@ use Zend\EventManager\EventsCapableInterface;
 use ArrayObject;
 
 /**
- * Class Client
- *
- * @package PamiModule\Service
+ * Class Client.
  */
 class Client implements EventsCapableInterface
 {
@@ -38,8 +36,8 @@ class Client implements EventsCapableInterface
     /**
      * Client constructor.
      *
-     * @param string                $host
-     * @param ClientImpl            $pami         PAMI client
+     * @param string     $host
+     * @param ClientImpl $pami PAMI client
      */
     public function __construct($host, ClientImpl $pami)
     {

@@ -6,6 +6,9 @@ use Interop\Container\ContainerInterface;
 use RuntimeException;
 use Zend\ServiceManager\FactoryInterface;
 
+/**
+ * Class AbstractFactory.
+ */
 abstract class AbstractFactory implements FactoryInterface
 {
     /**
@@ -29,8 +32,8 @@ abstract class AbstractFactory implements FactoryInterface
      * Gets options from configuration based on name.
      *
      * @param ContainerInterface $container Service locator
-     * @param string                  $key       Service type
-     * @param null|string             $name      Service name
+     * @param string             $key       Service type
+     * @param null|string        $name      Service name
      *
      * @return \Zend\Stdlib\AbstractOptions
      *
@@ -98,5 +101,4 @@ abstract class AbstractFactory implements FactoryInterface
      * @return string
      */
     abstract public function getOptionsClass();
-
 }

@@ -5,6 +5,9 @@ namespace PamiModule\Event;
 use Zend\EventManager\Event;
 use PAMI\Message\Event\EventMessage;
 
+/**
+ * Class PamiEvent.
+ */
 class PamiEvent extends Event
 {
     /**

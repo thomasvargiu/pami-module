@@ -8,9 +8,7 @@ use Zend\Log\Logger;
 
 /**
  * Class LogAppender
- * This class enables use of Zend\Log
- *
- * @package PamiModule\Log
+ * This class allows use of Zend\Log.
  */
 class LogAppender extends \LoggerAppender
 {
@@ -58,6 +56,7 @@ class LogAppender extends \LoggerAppender
      * Derived appenders should implement this method to perform actual logging.
      *
      * @param LoggerLoggingEvent $event Logger event
+     *
      * @throws \Zend\Log\Exception\InvalidArgumentException
      * @throws \Zend\Log\Exception\RuntimeException
      */
