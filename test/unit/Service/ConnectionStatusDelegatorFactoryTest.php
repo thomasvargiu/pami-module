@@ -11,7 +11,7 @@ class ConnectionStatusDelegatorFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $eventManager = $this->getMock('Zend\\EventManager\\EventManagerInterface');
         $client = $this->getMock('PamiModule\\Service\\Client', ['getEventManager'], [], '', false);
-        $serviceLocator = $this->getMock('Zend\\ServiceManager\\ServiceLocatorInterface');
+        $serviceLocator = $this->getMock('Zend\\ServiceManager\\ServiceManager');
 
         $client->expects(static::any())
             ->method('getEventManager')
