@@ -6,6 +6,11 @@ use PAMI\Listener\IEventListener;
 use PAMI\Message\Event\EventMessage;
 use PamiModule\Service\Client;
 
+/**
+ * Class EventForwarder
+ *
+ * @package PamiModule\Event
+ */
 class EventForwarder implements IEventListener
 {
     /**
@@ -38,6 +43,6 @@ class EventForwarder implements IEventListener
         $event->setName($eventName);
         $event->setTarget($this->client);
         $event->setEvent($e);
-        $this->client->getEventManager()->trigger($event);
+        $this->client->getEventManager()->triggerEvent($event);
     }
 }

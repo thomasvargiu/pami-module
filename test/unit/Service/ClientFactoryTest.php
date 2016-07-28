@@ -54,7 +54,7 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $connectionMock = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $connectionMock = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods(['registerEventListener'])
             ->getMock();
@@ -66,9 +66,9 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
         $serviceManager = $this->moduleLoader->getServiceManager();
         $serviceManager->setAllowOverride(true);
 
-        $config = $serviceManager->get('Config');
+        $config = $serviceManager->get('config');
         $config = ArrayUtils::merge($config, $configuration);
-        $serviceManager->setService('Config', $config);
+        $serviceManager->setService('config', $config);
         $serviceManager->setService('pami.connection.default', $connectionMock);
 
         $factory = new ClientFactory('default');

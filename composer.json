@@ -20,21 +20,26 @@
     }
   ],
   "require": {
-    "php": ">=5.4",
-    "marcelog/pami": "~1.7",
-    "zendframework/zend-stdlib": "~2.2",
-    "zendframework/zend-servicemanager": "~2.2",
-    "zendframework/zend-modulemanager": "~2.2",
-    "zendframework/zend-mvc": "~2.2",
-    "zendframework/zend-log": "~2.2"
+    "php": ">=5.6",
+    "marcelog/pami": "^1.7 || ^2.0",
+    "zendframework/zend-stdlib": "^2.7 || ^3.0",
+    "zendframework/zend-servicemanager": "^2.7 || ^3.0",
+    "zendframework/zend-modulemanager": "^2.7",
+    "zendframework/zend-mvc": "^2.7",
+    "zendframework/zend-log": "^2.9"
   },
   "require-dev": {
-    "zendframework/zend-test": "~2.2",
-    "phpunit/phpunit": "@stable",
-    "squizlabs/php_codesniffer": "@stable",
-    "phpmd/phpmd" : "@stable",
-    "fabpot/php-cs-fixer": "@stable",
-    "zendframework/zendframework": "~2.2"
+    "zendframework/zend-serializer": "^2.7",
+    "zendframework/zend-i18n": "^2.7",
+    "zendframework/zend-cache": "^2.7",
+    "zendframework/zend-test": "^2.6",
+    "apache/log4php": "^2.3",
+    "phpunit/phpunit": "^4.8 || ~5.2.0",
+    "squizlabs/php_codesniffer": "^2.5",
+    "friendsofphp/php-cs-fixer": "^1.11"
+  },
+  "suggest": {
+    "zendframework/zend-cache:^2.7": "To use CacheListener"
   },
   "autoload": {
     "psr-4": {

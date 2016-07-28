@@ -10,6 +10,11 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\ListenerAggregateTrait;
 
+/**
+ * Class CacheListener
+ *
+ * @package PamiModule\Listener
+ */
 class CacheListener implements ListenerAggregateInterface
 {
     use ListenerAggregateTrait;
@@ -94,11 +99,12 @@ class CacheListener implements ListenerAggregateInterface
      * implementation will pass this to the aggregate.
      *
      * @param EventManagerInterface $events The event manager
+     * @param int $priority
      */
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $this->listeners[] = $events->attach('sendAction.pre', [$this, 'onSendPre'], 20000);
-        $this->listeners[] = $events->attach('sendAction.post', [$this, 'onSendPost'], 20000);
+        $this->listeners[] = $events->attach('sendAction.pre', [$this, 'onSendPre'], $priority);
+        $this->listeners[] = $events->attach('sendAction.post', [$this, 'onSendPost'], $priority);
     }
 
     /**
@@ -107,6 +113,7 @@ class CacheListener implements ListenerAggregateInterface
      * @param EventInterface $event Triggered event
      *
      * @return void|\PAMI\Message\Response\ResponseMessage
+     * @throws \Zend\Cache\Exception\ExceptionInterface
      */
     public function onSendPre(EventInterface $event)
     {

@@ -2,9 +2,9 @@
 
 namespace PamiModule\Service;
 
+use Interop\Container\ContainerInterface;
 use RuntimeException;
 use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 abstract class AbstractFactory implements FactoryInterface
 {
@@ -28,21 +28,21 @@ abstract class AbstractFactory implements FactoryInterface
     /**
      * Gets options from configuration based on name.
      *
-     * @param ServiceLocatorInterface $sl   Service locator
-     * @param string                  $key  Service type
-     * @param null|string             $name Service name
+     * @param ContainerInterface $container Service locator
+     * @param string                  $key       Service type
+     * @param null|string             $name      Service name
      *
      * @return \Zend\Stdlib\AbstractOptions
      *
      * @throws \RuntimeException
      */
-    public function getOptions(ServiceLocatorInterface $sl, $key, $name = null)
+    public function getOptions(ContainerInterface $container, $key, $name = null)
     {
         if ($name === null) {
             $name = $this->getName();
         }
 
-        if (!$this->hasOptions($sl, $key, $name)) {
+        if (!$this->hasOptions($container, $key, $name)) {
             // @codeCoverageIgnoreStart
             throw new RuntimeException(
                 sprintf(
@@ -54,7 +54,7 @@ abstract class AbstractFactory implements FactoryInterface
             // @codeCoverageIgnoreEnd
         }
 
-        $options = $sl->get('Config');
+        $options = $container->get('config');
         $options = $options['pami_module'];
         $options = isset($options[$key][$name]) ? $options[$key][$name] : null;
 
@@ -66,15 +66,15 @@ abstract class AbstractFactory implements FactoryInterface
     /**
      * Return if options exists in configuration.
      *
-     * @param ServiceLocatorInterface $sl   Service locator
-     * @param string                  $key  Service type
-     * @param string                  $name Service name
+     * @param ContainerInterface $container Service locator
+     * @param string             $key       Service type
+     * @param string             $name      Service name
      *
      * @return bool
      */
-    public function hasOptions(ServiceLocatorInterface $sl, $key, $name)
+    public function hasOptions(ContainerInterface $container, $key, $name)
     {
-        $options = $sl->get('Config');
+        $options = $container->get('config');
         $options = $options['pami_module'];
 
         return isset($options[$key][$name]);
@@ -98,4 +98,5 @@ abstract class AbstractFactory implements FactoryInterface
      * @return string
      */
     abstract public function getOptionsClass();
+
 }

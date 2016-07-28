@@ -5,6 +5,11 @@ namespace PamiModule;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
+/**
+ * Class Module
+ *
+ * @package PamiModule
+ */
 class Module implements ConfigProviderInterface, AutoloaderProviderInterface
 {
     /**

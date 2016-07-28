@@ -2,11 +2,17 @@
 
 namespace PamiModule\Service;
 
+use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use PAMI\Client\Impl\ClientImpl;
 use PamiModule\Options\Connection as ConnectionOptions;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
+/**
+ * Class ConnectionFactory
+ *
+ * @package PamiModule\Service
+ */
 class ConnectionFactory extends AbstractFactory
 {
     /**
@@ -16,7 +22,23 @@ class ConnectionFactory extends AbstractFactory
      */
     public function getOptionsClass()
     {
-        return 'PamiModule\\Options\\Connection';
+        return \PamiModule\Options\Connection::class;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @param string             $requestedName
+     * @param array|null         $options
+     * @return ClientImpl
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        /* @var $options ConnectionOptions */
+        $options = $this->getOptions($container, 'connection');
+
+        return $this->createConnection($options);
     }
 
     /**
@@ -24,14 +46,11 @@ class ConnectionFactory extends AbstractFactory
      *
      * @param ServiceLocatorInterface $serviceLocator
      *
-     * @return mixed
+     * @return ClientImpl
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        /* @var $options ConnectionOptions */
-        $options = $this->getOptions($serviceLocator, 'connection');
-
-        return $this->createConnection($options);
+        return $this($serviceLocator, ClientImpl::class);
     }
 
     /**
@@ -43,7 +62,6 @@ class ConnectionFactory extends AbstractFactory
      */
     protected function createConnection(ConnectionOptions $options)
     {
-        // @todo: implement logger
         $clientOptions = [
             'host' => $options->getHost(),
             'port' => $options->getPort(),
@@ -54,7 +72,7 @@ class ConnectionFactory extends AbstractFactory
             'scheme' => $options->getScheme(),
         ];
 
-        // Disable loggin
+        // Disable loggin for version <2.0
         $clientOptions['log4php.properties'] = [
             'rootLogger' => [
                 'appenders' => ['default'],
@@ -66,9 +84,6 @@ class ConnectionFactory extends AbstractFactory
             ],
         ];
 
-        /** @var ClientImpl $pami */
-        $pami = new ClientImpl($clientOptions);
-
-        return $pami;
+        return new ClientImpl($clientOptions);
     }
 }

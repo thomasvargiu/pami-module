@@ -2,23 +2,34 @@
 
 namespace PamiModuleTest\Service;
 
+use PamiModule\Listener\ConnectionStatusListener;
 use PamiModule\Service\ConnectionStatusDelegatorFactory;
 
 class ConnectionStatusDelegatorFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateDelegatorWithName()
     {
-        $eventManager = static::getMock('Zend\\EventManager\\EventManagerInterface');
-        $client = static::getMock('PamiModule\\Service\\Client', ['getEventManager'], [], '', false);
-        $serviceLocator = static::getMock('Zend\\ServiceManager\\ServiceLocatorInterface');
+        $eventManager = $this->getMock('Zend\\EventManager\\EventManagerInterface');
+        $client = $this->getMock('PamiModule\\Service\\Client', ['getEventManager'], [], '', false);
+        $serviceLocator = $this->getMock('Zend\\ServiceManager\\ServiceLocatorInterface');
 
         $client->expects(static::any())
             ->method('getEventManager')
             ->willReturn($eventManager);
 
-        $eventManager->expects(static::once())
-            ->method('attachAggregate')
-            ->with(static::isInstanceOf('PamiModule\\Listener\\ConnectionStatusListener'));
+        $listener = $this->getMockBuilder(ConnectionStatusListener::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['attach'])
+            ->getMock();
+
+        $serviceLocator->expects(static::once())
+            ->method('get')
+            ->with(ConnectionStatusListener::class)
+            ->willReturn($listener);
+
+        $listener->expects(static::once())
+            ->method('attach')
+            ->with($eventManager);
 
         $callback = function () use ($client) {
             return $client;

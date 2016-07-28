@@ -4,6 +4,11 @@ namespace PamiModule\Options;
 
 use Zend\Stdlib\AbstractOptions;
 
+/**
+ * Class Connection
+ *
+ * @package PamiModule\Options
+ */
 class Connection extends AbstractOptions
 {
     const SCHEME_TCP = 'tcp://';

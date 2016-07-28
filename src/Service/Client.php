@@ -5,12 +5,19 @@ namespace PamiModule\Service;
 use PAMI\Client\Impl\ClientImpl;
 use PAMI\Message\OutgoingMessage;
 use PAMI\Message\Response\ResponseMessage;
-use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\EventManagerAwareTrait;
 use Zend\EventManager\EventsCapableInterface;
-use Zend\Stdlib\ArrayObject;
+use ArrayObject;
 
+/**
+ * Class Client
+ *
+ * @package PamiModule\Service
+ */
 class Client implements EventsCapableInterface
 {
+    use EventManagerAwareTrait;
+
     /**
      * PAMI client.
      *
@@ -24,12 +31,6 @@ class Client implements EventsCapableInterface
      */
     protected $params = [];
     /**
-     * Event manager.
-     *
-     * @var EventManagerInterface
-     */
-    protected $eventManager;
-    /**
      * @var string
      */
     protected $host;
@@ -39,13 +40,11 @@ class Client implements EventsCapableInterface
      *
      * @param string                $host
      * @param ClientImpl            $pami         PAMI client
-     * @param EventManagerInterface $eventManager EventManager
      */
-    public function __construct($host, ClientImpl $pami, EventManagerInterface $eventManager)
+    public function __construct($host, ClientImpl $pami)
     {
         $this->host = $host;
         $this->connection = $pami;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -66,16 +65,6 @@ class Client implements EventsCapableInterface
     public function getConnection()
     {
         return $this->connection;
-    }
-
-    /**
-     * Return the EventManager.
-     *
-     * @return EventManagerInterface
-     */
-    public function getEventManager()
-    {
-        return $this->eventManager;
     }
 
     /**
@@ -152,6 +141,7 @@ class Client implements EventsCapableInterface
     public function process()
     {
         $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+
         if ($results->stopped()) {
             return $this;
         }
@@ -175,9 +165,14 @@ class Client implements EventsCapableInterface
     public function sendAction(OutgoingMessage $action)
     {
         $params = new ArrayObject(['action' => $action]);
-        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this, $params, function ($response) {
-            return $response instanceof ResponseMessage;
-        });
+        $results = $this->getEventManager()->triggerUntil(
+            function ($response) {
+                return $response instanceof ResponseMessage;
+            },
+            __FUNCTION__.'.pre',
+            $this,
+            $params
+        );
         if ($results->stopped()) {
             return $results->last();
         }

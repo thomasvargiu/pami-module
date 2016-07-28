@@ -40,9 +40,9 @@ class ConnectionFactoryTest extends \PHPUnit_Framework_TestCase
         $serviceManager = $this->moduleLoader->getServiceManager();
         $serviceManager->setAllowOverride(true);
 
-        $config = $serviceManager->get('Config');
+        $config = $serviceManager->get('config');
         $config = ArrayUtils::merge($config, $configuration);
-        $serviceManager->setService('Config', $config);
+        $serviceManager->setService('config', $config);
 
         $factory = new ConnectionFactory('default');
         $service = $factory->createService($serviceManager);

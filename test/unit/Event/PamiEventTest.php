@@ -10,7 +10,7 @@ class PamiEventTest extends \PHPUnit_Framework_TestCase
     {
         $event = new PamiEvent();
 
-        $pamiEvent = static::getMockBuilder('PAMI\\Message\\Event\\EventMessage')
+        $pamiEvent = $this->getMockBuilder('PAMI\\Message\\Event\\EventMessage')
             ->disableOriginalConstructor()
             ->getMock();
 

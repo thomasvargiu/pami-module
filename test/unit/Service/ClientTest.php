@@ -8,17 +8,18 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 {
     public function testClient()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->getMock();
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
         /* @var \Zend\EventManager\EventManager $eventManager */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
         static::assertSame($pami, $client->getConnection());
         static::assertEquals('host', $client->getHost());
 
@@ -34,24 +35,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testConnect()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods(['open'])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->setMethods(['trigger'])
             ->getMock();
 
         $pami->expects(static::once())
             ->method('open');
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::exactly(2))
             ->method('trigger')
@@ -67,21 +69,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testConnectStopped()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods([])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->setMethods(['trigger'])
             ->getMock();
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::once())
             ->method('trigger')
@@ -94,24 +97,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testDisconnect()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods(['close'])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->setMethods(['trigger'])
             ->getMock();
 
         $pami->expects(static::once())
             ->method('close');
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::exactly(2))
             ->method('trigger')
@@ -127,21 +131,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testDisconnectStopped()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods([])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->setMethods(['trigger'])
             ->getMock();
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::once())
             ->method('trigger')
@@ -154,24 +159,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods(['process'])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->setMethods(['trigger', 'stopped'])
             ->getMock();
 
         $pami->expects(static::once())
             ->method('process');
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::exactly(2))
             ->method('trigger')
@@ -187,21 +193,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessStopped()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods([])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
             ->setMethods(['trigger'])
             ->getMock();
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::once())
             ->method('trigger')
@@ -214,16 +221,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testSendAction()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods(['send'])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
+            ->setMethods(['trigger', 'triggerUntil'])
             ->getMock();
 
-        $action = static::getMockBuilder('PAMI\\Message\\OutgoingMessage')
+        $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -232,20 +239,22 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->with($action)
             ->willReturn('foo');
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
-        $eventManager->expects(static::exactly(2))
+        $eventManager->expects(static::exactly(1))
+            ->method('triggerUntil')
+            ->with(static::isType('callable'), 'sendAction.pre', $client, static::isInstanceOf('ArrayObject'))
+            ->willReturn($eventResults);
+
+        $eventManager->expects(static::exactly(1))
             ->method('trigger')
-            ->withConsecutive(
-                ['sendAction.pre', $client, static::isInstanceOf('Zend\\Stdlib\\ArrayObject')],
-                ['sendAction.post', $client, static::isInstanceOf('Zend\\Stdlib\\ArrayObject')]
-            )
-        ->willReturn($eventResults);
+            ->with('sendAction.post', $client, static::isInstanceOf('ArrayObject'));
 
         $result = $client->sendAction($action);
         static::assertEquals('foo', $result);
@@ -253,35 +262,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testSendActionStopped()
     {
-        $pami = static::getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
+        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
             ->disableOriginalConstructor()
             ->setMethods([])
             ->getMock();
 
-        $eventManager = static::getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
+            ->setMethods(['triggerUntil'])
             ->getMock();
 
-        $action = static::getMockBuilder('PAMI\\Message\\OutgoingMessage')
+        $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $response = static::getMock('PAMI\\Message\\Response\\ResponseMessage', [], [], '', false);
+        $response = $this->getMock('PAMI\\Message\\Response\\ResponseMessage', [], [], '', false);
 
-        $eventResults = static::getMock('Zend\\EventManager\\ResponseCollection', ['stopped', 'last'], [], '', false);
+        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped', 'last'], [], '', false);
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
         $eventResults->expects(static::once())->method('last')->willReturn($response);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
 
-        $client = new Client('host', $pami, $eventManager);
+        $client = new Client('host', $pami);
+        $client->setEventManager($eventManager);
 
         $eventManager->expects(static::once())
-            ->method('trigger')
+            ->method('triggerUntil')
             ->with(
-                'sendAction.pre',
-                $client,
-                static::isInstanceOf('Zend\\Stdlib\\ArrayObject'),
                 static::callback(
                     function ($callback) use ($response) {
                         static::assertFalse($callback(null));
@@ -291,7 +298,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
                         return true;
                     }
-                )
+                ),
+                'sendAction.pre',
+                $client,
+                static::isInstanceOf('ArrayObject')
             )
             ->willReturn($eventResults);
 

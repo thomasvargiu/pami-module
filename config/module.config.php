@@ -1,16 +1,24 @@
 <?php
+
+namespace PamiModule;
+
+use Zend\ServiceManager\Factory\InvokableFactory;
+
 return [
     'pami_module' => [
         'connection' => [],
         'client' => []
     ],
     'pami_module_factories' => [
-        'connection' => 'PamiModule\\Service\\ConnectionFactory',
-        'client' => 'PamiModule\\Service\\ClientFactory'
+        'connection' => Service\ConnectionFactory::class,
+        'client' => Service\ClientFactory::class,
     ],
     'service_manager' => [
+        'factories' => [
+            Listener\ConnectionStatusListener::class => InvokableFactory::class,
+        ],
         'abstract_factories' => [
-            'PamiModule\\Factory\\AbstractPamiServiceFactory'
+            Factory\AbstractPamiServiceFactory::class,
         ]
     ]
 ];

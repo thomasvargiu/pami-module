@@ -9,11 +9,11 @@ class EventForwarderTest extends \PHPUnit_Framework_TestCase
 {
     public function testHandle()
     {
-        $client = static::getMockBuilder('PamiModule\\Service\\Client')
+        $client = $this->getMockBuilder('PamiModule\\Service\\Client')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $pamiEvent = static::getMockBuilder('PAMI\\Message\\Event\\EventMessage')
+        $pamiEvent = $this->getMockBuilder('PAMI\\Message\\Event\\EventMessage')
             ->disableOriginalConstructor()
             ->setMethods(['getName'])
             ->getMock();
@@ -22,10 +22,10 @@ class EventForwarderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->willReturn('Foo');
 
-        $eventManager = static::getMock('Zend\\EventManager\\EventManager', ['trigger']);
+        $eventManager = $this->getMock('Zend\\EventManager\\EventManager', ['triggerEvent']);
 
         $eventManager->expects(static::once())
-            ->method('trigger')
+            ->method('triggerEvent')
             ->with(static::callback(function (PamiEvent $e) use ($client, $pamiEvent) {
                 static::assertInstanceOf('PamiModule\\Event\\PamiEvent', $e);
                 static::assertSame($client, $e->getTarget());

@@ -7,6 +7,11 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\EventManager\ListenerAggregateTrait;
 
+/**
+ * Class ConnectionStatusListener
+ *
+ * @package PamiModule\Listener
+ */
 class ConnectionStatusListener implements ListenerAggregateInterface
 {
     use ListenerAggregateTrait;
@@ -23,13 +28,14 @@ class ConnectionStatusListener implements ListenerAggregateInterface
      * implementation will pass this to the aggregate.
      *
      * @param EventManagerInterface $events
+     * @param int $priority
      */
-    public function attach(EventManagerInterface $events)
+    public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $this->listeners[] = $events->attach('connect.pre', [$this, 'onConnect'], 10000);
-        $this->listeners[] = $events->attach('disconnect.pre', [$this, 'onDisconnect'], 10000);
-        $this->listeners[] = $events->attach('process.pre', [$this, 'onProcess'], 10000);
-        $this->listeners[] = $events->attach('sendAction.pre', [$this, 'onSendAction'], 10000);
+        $this->listeners[] = $events->attach('connect.pre', [$this, 'onConnect'], $priority);
+        $this->listeners[] = $events->attach('disconnect.pre', [$this, 'onDisconnect'], $priority);
+        $this->listeners[] = $events->attach('process.pre', [$this, 'onProcess'], $priority);
+        $this->listeners[] = $events->attach('sendAction.pre', [$this, 'onSendAction'], $priority);
     }
 
     /**

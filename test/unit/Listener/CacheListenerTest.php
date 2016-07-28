@@ -11,8 +11,8 @@ class CacheListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testAttach()
     {
-        $events = static::getMock('Zend\\EventManager\\EventManagerInterface');
-        $cache = static::getMock('Zend\\Cache\\Storage\\StorageInterface');
+        $events = $this->getMock('Zend\\EventManager\\EventManagerInterface');
+        $cache = $this->getMock('Zend\\Cache\\Storage\\StorageInterface');
 
         $events->expects(static::exactly(2))
             ->method('attach')
@@ -30,10 +30,10 @@ class CacheListenerTest extends \PHPUnit_Framework_TestCase
     public function testCacheAction()
     {
         $actionsToCache = ['Foo'];
-        $client = static::getMock('PamiModule\\Service\\Client', ['getHost'], [], '', false);
+        $client = $this->getMock('PamiModule\\Service\\Client', ['getHost'], [], '', false);
         $client->expects(static::atLeast(1))->method('getHost')->willReturn('foo.com');
 
-        $action = static::getMock('PAMI\\Message\\OutgoingMessage', [], [], '', false);
+        $action = $this->getMock('PAMI\\Message\\OutgoingMessage', [], [], '', false);
         $action->expects(static::any())->method('getKey')->with('Action')->willReturn('Foo');
         $action->expects(static::any())->method('getKeys')->willReturn(['foo' => 'bar', 'bar' => 'foo']);
 
@@ -57,9 +57,9 @@ class CacheListenerTest extends \PHPUnit_Framework_TestCase
     public function testNotCacheableAction()
     {
         $actionsToCache = [];
-        $client = static::getMock('PamiModule\\Service\\Client', ['getHost'], [], '', false);
+        $client = $this->getMock('PamiModule\\Service\\Client', ['getHost'], [], '', false);
 
-        $action = static::getMock('PAMI\\Message\\OutgoingMessage', [], [], '', false);
+        $action = $this->getMock('PAMI\\Message\\OutgoingMessage', [], [], '', false);
         $action->expects(static::any())->method('getKey')->with('Action')->willReturn('Bar');
         $action->expects(static::any())->method('getKeys')->willReturn(['foo' => 'bar', 'bar' => 'foo']);
 

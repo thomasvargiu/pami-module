@@ -11,16 +11,16 @@ class LogAppenderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAppend($levelInt, $zendLogInt)
     {
-        $logger = static::getMockBuilder('Zend\\Log\\Logger')
+        $logger = $this->getMockBuilder('Zend\\Log\\Logger')
             ->setMethods(['log'])
             ->getMock();
 
-        $loggerLevel = static::getMockBuilder('LoggerLevel')
+        $loggerLevel = $this->getMockBuilder('LoggerLevel')
             ->disableOriginalConstructor()
             ->setMethods(['toInt'])
             ->getMock();
 
-        $event = static::getMockBuilder('LoggerLoggingEvent')
+        $event = $this->getMockBuilder('LoggerLoggingEvent')
             ->disableOriginalConstructor()
             ->setMethods(['getLevel', 'getMessage'])
             ->getMock();
