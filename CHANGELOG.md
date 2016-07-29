@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.4.2 - 2016-07-29
+### Added
+- Nothing
+
+### Changed
+- Nothing
+
+## Fixed
+- Fixed the ConnectionStatusListener to be not shared
+
+### Removed
+- Nothing
+
+
 ## 0.4.1 - 2016-07-28
 ### Added
 - Nothing
@@ -8,7 +22,7 @@
 - Nothing
 
 ## Fixed
-- Fix triggerUntil sign allowing zend-eventmanager v2
+- Fixed triggerUntil sign allowing zend-eventmanager v2
 
 ### Removed
 - Nothing
