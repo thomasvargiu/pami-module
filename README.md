@@ -1,7 +1,8 @@
 PamiModule
 ==========
 
-A ZF2 module for [PAMI](https://github.com/marcelog/PAMI) library.
+A ZF module for [PAMI](https://github.com/marcelog/PAMI) library.
+Compatible with ZF2 and ZF3.
 
 [![Build Status](https://travis-ci.org/thomasvargiu/pami-module.svg?branch=master)](https://travis-ci.org/thomasvargiu/pami-module)
 [![Code Coverage](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/?branch=master)
