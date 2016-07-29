@@ -19,6 +19,9 @@ return [
         ],
         'abstract_factories' => [
             Factory\AbstractPamiServiceFactory::class,
-        ]
+        ],
+        'shared' => [
+            Listener\ConnectionStatusListener::class => false,
+        ],
     ]
 ];
