@@ -11,8 +11,8 @@ class CacheListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testAttach()
     {
-        $events = $this->getMock('Zend\\EventManager\\EventManagerInterface');
-        $cache = $this->getMock('Zend\\Cache\\Storage\\StorageInterface');
+        $events = $this->getMockBuilder('Zend\\EventManager\\EventManagerInterface')->getMock();
+        $cache = $this->getMockBuilder('Zend\\Cache\\Storage\\StorageInterface')->getMock();
 
         $events->expects(static::exactly(2))
             ->method('attach')
@@ -30,10 +30,15 @@ class CacheListenerTest extends \PHPUnit_Framework_TestCase
     public function testCacheAction()
     {
         $actionsToCache = ['Foo'];
-        $client = $this->getMock('PamiModule\\Service\\Client', ['getHost'], [], '', false);
+        $client = $this->getMockBuilder('PamiModule\\Service\\Client')
+            ->setMethods(['getHost'])
+            ->disableOriginalConstructor()
+            ->getMock();
         $client->expects(static::atLeast(1))->method('getHost')->willReturn('foo.com');
 
-        $action = $this->getMock('PAMI\\Message\\OutgoingMessage', [], [], '', false);
+        $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
+            ->disableOriginalConstructor()
+            ->getMock();
         $action->expects(static::any())->method('getKey')->with('Action')->willReturn('Foo');
         $action->expects(static::any())->method('getKeys')->willReturn(['foo' => 'bar', 'bar' => 'foo']);
 
@@ -57,9 +62,14 @@ class CacheListenerTest extends \PHPUnit_Framework_TestCase
     public function testNotCacheableAction()
     {
         $actionsToCache = [];
-        $client = $this->getMock('PamiModule\\Service\\Client', ['getHost'], [], '', false);
+        $client = $this->getMockBuilder('PamiModule\\Service\\Client')
+            ->disableOriginalConstructor()
+            ->setMethods(['getHost'])
+            ->getMock();
 
-        $action = $this->getMock('PAMI\\Message\\OutgoingMessage', [], [], '', false);
+        $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
+            ->disableOriginalConstructor()
+            ->getMock();
         $action->expects(static::any())->method('getKey')->with('Action')->willReturn('Bar');
         $action->expects(static::any())->method('getKeys')->willReturn(['foo' => 'bar', 'bar' => 'foo']);
 

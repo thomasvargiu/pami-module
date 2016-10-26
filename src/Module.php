@@ -2,37 +2,30 @@
 
 namespace PamiModule;
 
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
-use Zend\ModuleManager\Feature\ConfigProviderInterface;
-
 /**
  * Class Module.
  */
-class Module implements ConfigProviderInterface, AutoloaderProviderInterface
+class Module
 {
     /**
-     * {@inheritdoc}
+     * Provide configuration for an application integrating PamiModule.
      *
      * @return array
      */
     public function getConfig()
     {
-        return include __DIR__.'/../config/module.config.php';
-    }
+        $provider = new ConfigProvider();
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getAutoloaderConfig()
-    {
         return [
-            'Zend\Loader\StandardAutoloader' => [
-                'namespaces' => [
-                    __NAMESPACE__ => __DIR__,
-                ],
+            'pami_module' => [
+                'connection' => [],
+                'client' => [],
             ],
+            'pami_module_factories' => [
+                'connection' => Service\ConnectionFactory::class,
+                'client' => Service\ClientFactory::class,
+            ],
+            'service_manager' => $provider->getDependencyConfig(),
         ];
     }
 }

@@ -1,5 +1,33 @@
 # Change Log
 
+## 0.5.1 - TBD
+### Added
+- Nothing
+
+### Changed
+- Nothing
+
+## Fixed
+- Nothing
+
+### Removed
+- Nothing
+
+## 0.5.0 - 2016-10-26
+### Added
+- Added zend-mvc 3 compatibility
+- Added `ConfigProvider`
+
+### Changed
+- Nothing
+
+## Fixed
+- Nothing
+
+### Removed
+- Nothing
+
+
 ## 0.4.2 - 2016-07-29
 ### Added
 - Nothing

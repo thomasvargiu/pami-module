@@ -110,9 +110,9 @@ class CacheListener implements ListenerAggregateInterface
      *
      * @param EventInterface $event Triggered event
      *
-     * @return void|\PAMI\Message\Response\ResponseMessage
-     *
      * @throws \Zend\Cache\Exception\ExceptionInterface
+     *
+     * @return void|\PAMI\Message\Response\ResponseMessage
      */
     public function onSendPre(EventInterface $event)
     {
@@ -190,6 +190,6 @@ class CacheListener implements ListenerAggregateInterface
         ksort($keys);
         ksort($variables);
 
-        return md5($prefix.json_encode(array_merge($keys, $variables)));
+        return md5($prefix . json_encode(array_merge($keys, $variables)));
     }
 }

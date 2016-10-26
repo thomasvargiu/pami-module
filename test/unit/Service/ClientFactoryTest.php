@@ -16,7 +16,7 @@ class ClientFactoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->moduleLoader = new ModuleLoader(include __DIR__.'/../../TestConfiguration.php.dist');
+        $this->moduleLoader = new ModuleLoader(include __DIR__ . '/../../TestConfiguration.php');
     }
 
     public function testCreateService()

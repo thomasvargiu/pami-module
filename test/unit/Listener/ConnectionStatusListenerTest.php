@@ -9,7 +9,7 @@ class ConnectionStatusListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testAttach()
     {
-        $events = $this->getMock('Zend\\EventManager\\EventManagerInterface');
+        $events = $this->getMockBuilder('Zend\\EventManager\\EventManagerInterface')->getMock();
 
         $events->expects(static::atLeast(4))
             ->method('attach')
@@ -62,7 +62,10 @@ class ConnectionStatusListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnProcess()
     {
-        $client = $this->getMock('PamiModule\\Service\\Client', ['connect'], [], '', false);
+        $client = $this->getMockBuilder('PamiModule\\Service\\Client')
+            ->disableOriginalConstructor()
+            ->setMethods(['connect'])
+            ->getMock();
         $listener = new ConnectionStatusListener();
 
         $client->expects(static::once())
@@ -81,7 +84,10 @@ class ConnectionStatusListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnSendAction()
     {
-        $client = $this->getMock('PamiModule\\Service\\Client', ['connect'], [], '', false);
+        $client = $this->getMockBuilder('PamiModule\\Service\\Client')
+            ->disableOriginalConstructor()
+            ->setMethods(['connect'])
+            ->getMock();
         $listener = new ConnectionStatusListener();
 
         $client->expects(static::once())

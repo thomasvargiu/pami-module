@@ -48,7 +48,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $pami->expects(static::once())
             ->method('open');
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -79,7 +82,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['trigger'])
             ->getMock();
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -110,7 +116,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $pami->expects(static::once())
             ->method('close');
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -141,7 +150,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['trigger'])
             ->getMock();
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -172,7 +184,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $pami->expects(static::once())
             ->method('process');
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -203,7 +218,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['trigger'])
             ->getMock();
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -240,7 +258,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->with($action)
             ->willReturn('foo');
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(false);
 
         /* @var \PAMI\Client\Impl\ClientImpl $pami */
@@ -276,9 +297,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $response = $this->getMock('PAMI\\Message\\Response\\ResponseMessage', [], [], '', false);
+        $response = $this->getMockBuilder('PAMI\\Message\\Response\\ResponseMessage')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $eventResults = $this->getMock('Zend\\EventManager\\ResponseCollection', ['stopped', 'last'], [], '', false);
+        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
+            ->disableOriginalConstructor()
+            ->setMethods(['stopped', 'last'])
+            ->getMock();
         $eventResults->expects(static::once())->method('stopped')->willReturn(true);
         $eventResults->expects(static::once())->method('last')->willReturn($response);
 

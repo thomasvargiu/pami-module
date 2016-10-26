@@ -36,7 +36,7 @@ class EventForwarder implements IEventListener
     public function handle(EventMessage $e)
     {
         $eventPrefix = 'event.';
-        $eventName = $eventPrefix.$e->getName();
+        $eventName = $eventPrefix . $e->getName();
         $event = new PamiEvent();
         $event->setName($eventName);
         $event->setTarget($this->client);

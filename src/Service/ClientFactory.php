@@ -5,8 +5,8 @@ namespace PamiModule\Service;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use PAMI\Client\Impl\ClientImpl;
-use PamiModule\Options\Client as ClientOptions;
 use PamiModule\Event\EventForwarder;
+use PamiModule\Options\Client as ClientOptions;
 use PamiModule\Options\Connection;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -34,14 +34,14 @@ class ClientFactory extends AbstractFactory
      * @param string             $requestedName
      * @param null|array         $options
      *
-     * @return Client
-     *
      * @throws \RuntimeException
      * @throws \Interop\Container\Exception\NotFoundException
-     * @throws ServiceNotFoundException                       if unable to resolve the service.
+     * @throws ServiceNotFoundException                       if unable to resolve the service
      * @throws ServiceNotCreatedException                     if an exception is raised when
-     *                                                        creating a service.
+     *                                                        creating a service
      * @throws ContainerException                             if any other error occurs
+     *
+     * @return Client
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

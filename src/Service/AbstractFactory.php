@@ -35,9 +35,9 @@ abstract class AbstractFactory implements FactoryInterface
      * @param string             $key       Service type
      * @param null|string        $name      Service name
      *
-     * @return \Zend\Stdlib\AbstractOptions
-     *
      * @throws \RuntimeException
+     *
+     * @return \Zend\Stdlib\AbstractOptions
      */
     public function getOptions(ContainerInterface $container, $key, $name = null)
     {

@@ -28,10 +28,10 @@ class ConnectionFactory extends AbstractFactory
      * @param string             $requestedName
      * @param array|null         $options
      *
-     * @return ClientImpl
-     *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
+     *
+     * @return ClientImpl
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {

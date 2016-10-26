@@ -22,12 +22,13 @@ class EventForwarderTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->willReturn('Foo');
 
-        $eventManager = $this->getMock('Zend\\EventManager\\EventManager', ['triggerEvent']);
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
+            ->setMethods(['triggerEvent'])
+            ->getMock();
 
         $eventManager->expects(static::once())
             ->method('triggerEvent')
             ->with(static::callback(function (PamiEvent $e) use ($client, $pamiEvent) {
-                static::assertInstanceOf('PamiModule\\Event\\PamiEvent', $e);
                 static::assertSame($client, $e->getTarget());
                 static::assertSame($pamiEvent, $e->getEvent());
                 static::assertEquals('event.Foo', $e->getName());

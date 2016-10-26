@@ -20,24 +20,24 @@
     }
   ],
   "require": {
-    "php": ">=5.6",
+    "php": "^5.6 || ^7.0",
     "marcelog/pami": "^1.7 || ^2.0",
     "zendframework/zend-eventmanager": "^2.6 || ^3.0",
     "zendframework/zend-stdlib": "^2.7 || ^3.0",
     "zendframework/zend-servicemanager": "^2.7 || ^3.0",
-    "zendframework/zend-modulemanager": "^2.5",
-    "zendframework/zend-mvc": "^2.5",
+    "zendframework/zend-mvc": "^2.5 || ^3.0.3",
     "zendframework/zend-log": "^2.5"
   },
   "require-dev": {
+    "zendframework/zend-modulemanager": "^2.5",
     "zendframework/zend-serializer": "^2.5",
     "zendframework/zend-i18n": "^2.5",
     "zendframework/zend-cache": "^2.5",
-    "zendframework/zend-test": "^2.5",
+    "zendframework/zend-test": "^2.5 || ^3.0",
     "apache/log4php": "^2.3",
-    "phpunit/phpunit": "^4.8 || ^5.2",
+    "phpunit/phpunit": "^4.8.27 || ^5.2",
     "squizlabs/php_codesniffer": "^2.5",
-    "friendsofphp/php-cs-fixer": "^1.11"
+    "friendsofphp/php-cs-fixer": "^1.12"
   },
   "suggest": {
     "zendframework/zend-cache:^2.5": "To use CacheListener"
@@ -51,5 +51,27 @@
     "psr-4": {
       "PamiModuleTest\\": "test/unit/"
     }
+  },
+  "extra": {
+    "zf": {
+      "component": "PamiModule",
+      "config-provider": "PamiModule\\ConfigProvider"
+    }
+  },
+  "scripts": {
+    "check": [
+      "@cs-check",
+      "@test"
+    ],
+    "cs-check": [
+      "php-cs-fixer --config-file=./.php_cs fix -v --diff --dry-run src/",
+      "php-cs-fixer --config-file=./.php_cs fix -v --diff --dry-run test/unit/"
+    ],
+    "cs-fix": [
+      "php-cs-fixer --config-file=./.php_cs fix -v --diff src/",
+      "php-cs-fixer --config-file=./.php_cs fix -v --diff test/unit/"
+    ],
+    "test": "phpunit",
+    "test-coverage": "phpunit --coverage-clover clover.xml"
   }
 }

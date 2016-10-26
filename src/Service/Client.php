@@ -2,13 +2,13 @@
 
 namespace PamiModule\Service;
 
+use ArrayObject;
 use PAMI\Client\Impl\ClientImpl;
 use PAMI\Message\OutgoingMessage;
 use PAMI\Message\Response\ResponseMessage;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\EventManager\EventsCapableInterface;
-use ArrayObject;
 
 /**
  * Class Client.
@@ -93,20 +93,20 @@ class Client implements EventsCapableInterface
     /**
      * Connect to the Asterisk Manager Interface.
      *
-     * @return $this
-     *
      * @throws \PAMI\Client\Exception\ClientException
+     *
+     * @return $this
      */
     public function connect()
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        $results = $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this);
         if ($results->stopped()) {
             return $this;
         }
 
         $this->connection->open();
 
-        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this);
+        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this);
 
         return $this;
     }
@@ -118,14 +118,14 @@ class Client implements EventsCapableInterface
      */
     public function disconnect()
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        $results = $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this);
         if ($results->stopped()) {
             return $this;
         }
 
         $this->connection->close();
 
-        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this);
+        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this);
 
         return $this;
     }
@@ -139,7 +139,7 @@ class Client implements EventsCapableInterface
      */
     public function process()
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__.'.pre', $this);
+        $results = $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this);
 
         if ($results->stopped()) {
             return $this;
@@ -147,7 +147,7 @@ class Client implements EventsCapableInterface
 
         $this->connection->process();
 
-        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this);
+        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this);
 
         return $this;
     }
@@ -157,14 +157,14 @@ class Client implements EventsCapableInterface
      *
      * @param OutgoingMessage $action Action to send
      *
-     * @return \PAMI\Message\Response\ResponseMessage
-     *
      * @throws \PAMI\Client\Exception\ClientException
+     *
+     * @return \PAMI\Message\Response\ResponseMessage
      */
     public function sendAction(OutgoingMessage $action)
     {
         $params = new ArrayObject(['action' => $action]);
-        $event = new Event(__FUNCTION__.'.pre', $this, $params);
+        $event = new Event(__FUNCTION__ . '.pre', $this, $params);
         $results = $this->getEventManager()->triggerEventUntil(
             function ($response) {
                 return $response instanceof ResponseMessage;
@@ -178,7 +178,7 @@ class Client implements EventsCapableInterface
         $response = $this->connection->send($action);
 
         $params['response'] = $response;
-        $this->getEventManager()->trigger(__FUNCTION__.'.post', $this, $params);
+        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this, $params);
 
         return $response;
     }

@@ -2,8 +2,8 @@
 
 namespace PamiModule\Log;
 
-use LoggerLoggingEvent;
 use LoggerLevel;
+use LoggerLoggingEvent;
 use Zend\Log\Logger;
 
 /**

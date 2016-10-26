@@ -9,9 +9,12 @@ class ConnectionStatusDelegatorFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateDelegatorWithName()
     {
-        $eventManager = $this->getMock('Zend\\EventManager\\EventManagerInterface');
-        $client = $this->getMock('PamiModule\\Service\\Client', ['getEventManager'], [], '', false);
-        $serviceLocator = $this->getMock('Zend\\ServiceManager\\ServiceManager');
+        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManagerInterface')->getMock();
+        $client = $this->getMockBuilder('PamiModule\\Service\\Client')
+            ->disableOriginalConstructor()
+            ->setMethods(['getEventManager'])
+            ->getMock();
+        $serviceLocator = $this->getMockBuilder('Zend\\ServiceManager\\ServiceManager')->getMock();
 
         $client->expects(static::any())
             ->method('getEventManager')
