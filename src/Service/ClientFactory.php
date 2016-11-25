@@ -8,6 +8,7 @@ use PAMI\Client\Impl\ClientImpl;
 use PamiModule\Event\EventForwarder;
 use PamiModule\Options\Client as ClientOptions;
 use PamiModule\Options\Connection;
+use Zend\EventManager\EventManager;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -62,6 +63,7 @@ class ClientFactory extends AbstractFactory
         $connection = $container->get(sprintf('pami.connection.%s', $connectionName));
 
         $client = new Client($connectionOptions->getHost(), $connection);
+        $client->setEventManager($this->createEventManager($container));
 
         if ($options) {
             $client->setParams($options->getParams());
@@ -71,6 +73,46 @@ class ClientFactory extends AbstractFactory
         $client->getConnection()->registerEventListener($eventForwarder);
 
         return $client;
+    }
+
+    /**
+     * @param ContainerInterface $container
+     *
+     * @return EventManager
+     */
+    protected function createEventManager(ContainerInterface $container)
+    {
+        if ($this->acceptsSharedManagerToConstructor()) {
+            // zend-eventmanager v3
+            return new EventManager(
+                $container->has('SharedEventManager') ? $container->get('SharedEventManager') : null
+            );
+        }
+
+        // zend-eventmanager v2
+        $events = new EventManager();
+
+        if ($container->has('SharedEventManager')) {
+            $events->setSharedManager($container->get('SharedEventManager'));
+        }
+
+        return $events;
+    }
+
+    /**
+     * Does the EventManager accept the shared manager to the constructor?
+     *
+     * In zend-eventmanager v3, the EventManager accepts the shared manager
+     * instance to the constructor *only*, while in v2, it must be injected
+     * via the setSharedManager() method.
+     *
+     * @return bool
+     */
+    private function acceptsSharedManagerToConstructor()
+    {
+        $r = new \ReflectionClass(EventManager::class);
+
+        return !$r->hasMethod('setSharedManager');
     }
 
     /**
