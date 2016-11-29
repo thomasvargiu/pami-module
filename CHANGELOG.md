@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.5.3 - TBD
+## 0.5.4 - TBD
 ### Added
 - Nothing
 
@@ -9,6 +9,20 @@
 
 ### Fixed
 - Nothing
+
+### Removed
+- Nothing
+
+
+## 0.5.3 - 2016-11-29
+### Added
+- Nothing
+
+### Changed
+- Nothing
+
+### Fixed
+- Fixed event_mask array settings
 
 ### Removed
 - Nothing
