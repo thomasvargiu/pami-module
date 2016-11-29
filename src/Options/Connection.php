@@ -53,6 +53,10 @@ class Connection extends AbstractOptions
      * @var int
      */
     protected $readTimeout = 10000;
+    /**
+     * @var null|string[]
+     */
+    protected $eventMask;
 
     /**
      * Return the host.
@@ -220,5 +224,21 @@ class Connection extends AbstractOptions
         $this->readTimeout = (int) $readTimeout;
 
         return $this;
+    }
+
+    /**
+     * @return null|string[]
+     */
+    public function getEventMask()
+    {
+        return $this->eventMask;
+    }
+
+    /**
+     * @param null|string[] $eventMask
+     */
+    public function setEventMask(array $eventMask = null)
+    {
+        $this->eventMask = $eventMask;
     }
 }

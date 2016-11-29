@@ -70,9 +70,10 @@ class ConnectionFactory extends AbstractFactory
             'connect_timeout' => $options->getConnectTimeout(),
             'read_timeout' => $options->getReadTimeout(),
             'scheme' => $options->getScheme(),
+            'event_mask' => $options->getEventMask(),
         ];
 
-        // Disable loggin for version <2.0
+        // Disable logging for version <2.0
         $clientOptions['log4php.properties'] = [
             'rootLogger' => [
                 'appenders' => ['default'],
