@@ -1,17 +1,46 @@
 # Change Log
 
-## 0.5.1 - TBD
+## 0.5.3 - TBD
 ### Added
 - Nothing
 
 ### Changed
 - Nothing
 
-## Fixed
+### Fixed
 - Nothing
 
 ### Removed
 - Nothing
+
+
+## 0.5.2 - 2016-11-29
+### Added
+- Nothing
+
+### Changed
+- Enabled event mask on connection (PAMI >= 2.0.1)
+
+### Fixed
+- Nothing
+
+### Removed
+- Nothing
+
+
+## 0.5.1 - 2016-11-25
+### Added
+- Nothing
+
+### Changed
+- Injected EventManager on client factory
+
+### Fixed
+- Nothing
+
+### Removed
+- Nothing
+
 
 ## 0.5.0 - 2016-10-26
 ### Added
@@ -21,7 +50,7 @@
 ### Changed
 - Nothing
 
-## Fixed
+### Fixed
 - Nothing
 
 ### Removed
