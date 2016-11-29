@@ -62,6 +62,14 @@ class ConnectionFactory extends AbstractFactory
      */
     protected function createConnection(ConnectionOptions $options)
     {
+        $eventMask = $options->getEventMask();
+
+        if (is_array($eventMask) && 0 === count($eventMask)) {
+            $eventMask = 'off';
+        } elseif (is_array($eventMask)) {
+            $eventMask = implode(', ', $eventMask);
+        }
+
         $clientOptions = [
             'host' => $options->getHost(),
             'port' => $options->getPort(),
@@ -70,7 +78,7 @@ class ConnectionFactory extends AbstractFactory
             'connect_timeout' => $options->getConnectTimeout(),
             'read_timeout' => $options->getReadTimeout(),
             'scheme' => $options->getScheme(),
-            'event_mask' => $options->getEventMask(),
+            'event_mask' => $eventMask,
         ];
 
         // Disable logging for version <2.0
