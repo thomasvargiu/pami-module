@@ -27,11 +27,6 @@ matrix:
         - DEPS=lowest
     - php: 7.0
       env:
-        - EXECUTE_CS_CHECK=true
-        - EXECUTE_COVERAGE=true
-        - DEPS=locked
-    - php: 7.0
-      env:
         - DEPS=latest
     - php: 7.1
       env:
@@ -63,8 +58,7 @@ install:
   - travis_retry composer install $COMPOSER_ARGS
 
 script:
-  - if [[ $EXECUTE_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
-  - if [[ $EXECUTE_CS_CHECK == 'true' ]]; then composer cs-check ; fi
+  - if [[ $EXECUTE_COVERAGE == 'true' ]]; then ./vendor/bin/phpunit --coverage-clover clover.xml ; else ./vendor/bin/phpunit ; fi
 
 after_script:
   - if [[ $EXECUTE_COVERAGE == 'true' ]]; then travis_retry wget https://scrutinizer-ci.com/ocular.phar ; fi
