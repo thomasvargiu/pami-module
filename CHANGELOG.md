@@ -1,6 +1,19 @@
 # Change Log
 
-## 0.5.4 - TBD
+## 0.5.5 - TBD
+### Added
+- Nothing
+
+### Changed
+- Nothing
+
+### Fixed
+- Nothing
+
+### Removed
+- Nothing
+
+## 0.5.4 - 2017-12-01
 ### Added
 - Added PHP 7.2 support
 
