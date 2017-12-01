@@ -36,8 +36,8 @@
     "zendframework/zend-test": "^2.5 || ^3.0",
     "apache/log4php": "^2.3",
     "phpunit/phpunit": "^4.8.27 || ^5.2",
-    "squizlabs/php_codesniffer": "^2.5",
-    "friendsofphp/php-cs-fixer": "^1.12"
+    "sebastian/comparator": "^1.2.3 || ^2.0",
+    "squizlabs/php_codesniffer": "^2.5"
   },
   "suggest": {
     "zendframework/zend-cache:^2.5": "To use CacheListener"
@@ -59,18 +59,6 @@
     }
   },
   "scripts": {
-    "check": [
-      "@cs-check",
-      "@test"
-    ],
-    "cs-check": [
-      "php-cs-fixer --config-file=./.php_cs fix -v --diff --dry-run src/",
-      "php-cs-fixer --config-file=./.php_cs fix -v --diff --dry-run test/unit/"
-    ],
-    "cs-fix": [
-      "php-cs-fixer --config-file=./.php_cs fix -v --diff src/",
-      "php-cs-fixer --config-file=./.php_cs fix -v --diff test/unit/"
-    ],
     "test": "phpunit",
     "test-coverage": "phpunit --coverage-clover clover.xml"
   }
