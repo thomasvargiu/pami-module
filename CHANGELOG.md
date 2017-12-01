@@ -2,7 +2,7 @@
 
 ## 0.5.4 - TBD
 ### Added
-- Nothing
+- Added PHP 7.2 support
 
 ### Changed
 - Nothing
