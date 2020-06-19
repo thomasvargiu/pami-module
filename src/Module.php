@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PamiModule;
 
 /**
@@ -10,22 +12,18 @@ class Module
     /**
      * Provide configuration for an application integrating PamiModule.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
 
         return [
-            'pami_module' => [
+            'pami' => [
                 'connection' => [],
                 'client' => [],
             ],
-            'pami_module_factories' => [
-                'connection' => Service\ConnectionFactory::class,
-                'client' => Service\ClientFactory::class,
-            ],
-            'service_manager' => $provider->getDependencyConfig(),
+            'service_manager' => $provider->getDependencies(),
         ];
     }
 }

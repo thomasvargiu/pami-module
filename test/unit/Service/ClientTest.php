@@ -2,333 +2,327 @@
 
 namespace PamiModuleTest\Service;
 
+use PAMI\Client\Exception\ClientException;
+use PAMI\Client\IClient;
+use PAMI\Message\OutgoingMessage;
+use PAMI\Message\Response\ResponseMessage;
 use PamiModule\Service\Client;
-use Zend\EventManager\Event;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use PamiModule\Event;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+/**
+ * @covers \PamiModule\Service\Client
+ */
+class ClientTest extends TestCase
 {
-    public function testClient()
+    use ProphecyTrait;
+
+    private $connection;
+    private $eventDispatcher;
+
+    protected function setUp(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->getMock();
-
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
-        /* @var \Zend\EventManager\EventManager $eventManager */
-
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
-        static::assertSame($pami, $client->getConnection());
-        static::assertEquals('host', $client->getHost());
-
-        // Test attach EventManager
-
-        $eventManager = $client->getEventManager();
-        static::assertSame($eventManager, $client->getEventManager());
-
-        $params = ['foo' => 'bar'];
-        $client->setParams($params);
-        static::assertEquals($params, $client->getParams());
+        $this->connection = $this->prophesize(IClient::class);
+        $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
     }
 
-    public function testConnect()
+    private function getConnectedClient(): Client
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods(['open'])
-            ->getMock();
+        $client = new Client($this->connection->reveal(), $this->eventDispatcher->reveal());
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
-            ->getMock();
+        $connectingEvent = new Event\ConnectingEvent($client);
+        $connectedEvent = new Event\ConnectedEvent($client);
 
-        $pami->expects(static::once())
-            ->method('open');
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectingEvent::class)
+        ))
+            ->willReturn($connectingEvent);
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(false);
+        $this->connection->open()->shouldBeCalled();
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectedEvent::class)
+        ))
+            ->willReturn($connectedEvent);
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
+        $client->connect();
 
-        $eventManager->expects(static::exactly(2))
-            ->method('trigger')
-            ->withConsecutive(
-                ['connect.pre', $client],
-                ['connect.post', $client]
-            )
-            ->will(static::returnValue($eventResults));
-
-        $result = $client->connect();
-        static::assertSame($client, $result);
+        return $client;
     }
 
-    public function testConnectStopped()
+    public function testShouldConnect(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods([])
-            ->getMock();
+        $connection = $this->prophesize(IClient::class);
+        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
-            ->getMock();
+        $client = new Client($connection->reveal(), $eventDispatcher->reveal());
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(true);
+        $connectingEvent = new Event\ConnectingEvent($client);
+        $connectedEvent = new Event\ConnectedEvent($client);
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectingEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($connectingEvent);
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
+        $connection->open()->shouldBeCalledOnce();
 
-        $eventManager->expects(static::once())
-            ->method('trigger')
-            ->with('connect.pre', $client)
-            ->willReturn($eventResults);
+        $eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectedEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($connectedEvent);
 
-        $result = $client->connect();
-        static::assertSame($client, $result);
+        $client->connect();
     }
 
-    public function testDisconnect()
+    public function testShouldNotConnectWhenAlreadyConnected(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods(['close'])
-            ->getMock();
+        $connection = $this->prophesize(IClient::class);
+        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
-            ->getMock();
+        $client = new Client($connection->reveal(), $eventDispatcher->reveal());
 
-        $pami->expects(static::once())
-            ->method('close');
+        $connectingEvent = new Event\ConnectingEvent($client);
+        $connectedEvent = new Event\ConnectedEvent($client);
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(false);
+        $eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectingEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($connectingEvent);
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $connection->open()->shouldBeCalledOnce();
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
+        $eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectedEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($connectedEvent);
 
-        $eventManager->expects(static::exactly(2))
-            ->method('trigger')
-            ->withConsecutive(
-                ['disconnect.pre', $client],
-                ['disconnect.post', $client]
-            )
-            ->willReturn($eventResults);
-
-        $result = $client->disconnect();
-        static::assertSame($client, $result);
+        $client->connect();
+        $client->connect();
     }
 
-    public function testDisconnectStopped()
+    public function testShouldNotConnectWhenEventStopPropagation(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods([])
-            ->getMock();
+        $connection = $this->prophesize(IClient::class);
+        $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
-            ->getMock();
+        $client = new Client($connection->reveal(), $eventDispatcher->reveal());
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(true);
+        $connectingEvent = new Event\ConnectingEvent($client);
+        $connectingEvent->setPropagationStopped();
+        $connectedEvent = new Event\ConnectedEvent($client);
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectingEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($connectingEvent);
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
+        $connection->open()->shouldNotBeCalled();
 
-        $eventManager->expects(static::once())
-            ->method('trigger')
-            ->with('disconnect.pre', $client)
-            ->willReturn($eventResults);
+        $eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ConnectedEvent::class)
+        ))
+            ->shouldNotBeCalled()
+            ->willReturn($connectedEvent);
 
-        $result = $client->disconnect();
-        static::assertSame($client, $result);
+        $client->connect();
     }
 
-    public function testProcess()
+    public function testShouldDisconnect(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods(['process'])
-            ->getMock();
+        $client = $this->getConnectedClient();
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger', 'stopped'])
-            ->getMock();
+        $disconnectingEvent = new Event\DisconnectingEvent($client);
+        $disconnectedEvent = new Event\DisconnectedEvent($client);
 
-        $pami->expects(static::once())
-            ->method('process');
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\DisconnectingEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($disconnectingEvent);
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(false);
+        $this->connection->close()->shouldBeCalledOnce();
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\DisconnectedEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($disconnectedEvent);
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
-
-        $eventManager->expects(static::exactly(2))
-            ->method('trigger')
-            ->withConsecutive(
-                ['process.pre', $client],
-                ['process.post', $client]
-            )
-        ->willReturn($eventResults);
-
-        $result = $client->process();
-        static::assertSame($client, $result);
+        $client->disconnect();
     }
 
-    public function testProcessStopped()
+    public function testShouldNotDisconnectWhenNotConnected(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods([])
-            ->getMock();
+        $client = $this->getConnectedClient();
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger'])
-            ->getMock();
+        $disconnectingEvent = new Event\DisconnectingEvent($client);
+        $disconnectedEvent = new Event\DisconnectedEvent($client);
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(true);
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\DisconnectingEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($disconnectingEvent);
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $this->connection->close()->shouldBeCalledOnce();
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\DisconnectedEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($disconnectedEvent);
 
-        $eventManager->expects(static::once())
-            ->method('trigger')
-            ->with('process.pre', $client)
-            ->willReturn($eventResults);
-
-        $result = $client->process();
-        static::assertSame($client, $result);
+        $client->disconnect();
+        $client->disconnect();
     }
 
-    public function testSendAction()
+    public function testShouldNotDisconnectWhenEventStopPropagation(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods(['send'])
-            ->getMock();
+        $client = $this->getConnectedClient();
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['trigger', 'triggerEventUntil'])
-            ->getMock();
+        $disconnectingEvent = new Event\DisconnectingEvent($client);
+        $disconnectingEvent->setPropagationStopped();
 
-        $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\DisconnectingEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($disconnectingEvent);
 
-        $pami->expects(static::once())
-            ->method('send')
-            ->with($action)
-            ->willReturn('foo');
+        $this->connection->close()->shouldNotBeCalled();
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(false);
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\DisconnectedEvent::class)
+        ))
+            ->shouldNotBeCalled();
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
-
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
-
-        $eventManager->expects(static::exactly(1))
-            ->method('triggerEventUntil')
-            ->with(static::isType('callable'), static::isInstanceOf(Event::class))
-            ->willReturn($eventResults);
-
-        $eventManager->expects(static::exactly(1))
-            ->method('trigger')
-            ->with('sendAction.post', $client, static::isInstanceOf('ArrayObject'));
-
-        $result = $client->sendAction($action);
-        static::assertEquals('foo', $result);
+        $client->disconnect();
     }
 
-    public function testSendActionStopped()
+    public function testShouldProcess(): void
     {
-        $pami = $this->getMockBuilder('PAMI\\Client\\Impl\\ClientImpl')
-            ->disableOriginalConstructor()
-            ->setMethods([])
-            ->getMock();
+        $client = $this->getConnectedClient();
 
-        $eventManager = $this->getMockBuilder('Zend\\EventManager\\EventManager')
-            ->setMethods(['triggerEventUntil'])
-            ->getMock();
+        $this->connection->process()->shouldBeCalledOnce();
 
-        $action = $this->getMockBuilder('PAMI\\Message\\OutgoingMessage')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $client->process();
+    }
 
-        $response = $this->getMockBuilder('PAMI\\Message\\Response\\ResponseMessage')
-            ->disableOriginalConstructor()
-            ->getMock();
+    public function testShouldReconnectAndProcessOnConnectionError(): void
+    {
+        $connection = $this->connection;
+        $client = $this->getConnectedClient();
 
-        $eventResults = $this->getMockBuilder('Zend\\EventManager\\ResponseCollection')
-            ->disableOriginalConstructor()
-            ->setMethods(['stopped', 'last'])
-            ->getMock();
-        $eventResults->expects(static::once())->method('stopped')->willReturn(true);
-        $eventResults->expects(static::once())->method('last')->willReturn($response);
+        $clientException = new ClientException('exception');
 
-        /* @var \PAMI\Client\Impl\ClientImpl $pami */
+        $connection->open()->shouldBeCalledTimes(2);
+        $connection->process()->shouldBeCalledTimes(2)->will(function () use ($clientException, $connection) {
+            $connection->process()->shouldBeCalledTimes(2)->will(function () {});
+            throw $clientException;
+        });
 
-        $client = new Client('host', $pami);
-        $client->setEventManager($eventManager);
+        $client->process();
+    }
 
-        $eventManager->expects(static::exactly(1))
-            ->method('triggerEventUntil')
-            ->with(static::callback(
-                function ($callback) use ($response) {
-                    static::assertFalse($callback(null));
-                    static::assertFalse($callback('string'));
-                    static::assertFalse($callback([]));
-                    static::assertTrue($callback($response));
+    public function testShouldSendAction(): void
+    {
+        $client = $this->getConnectedClient();
 
-                    return true;
-                }
-            ), static::isInstanceOf(Event::class)
-            )
-            ->willReturn($eventResults);
+        $action = $this->prophesize(OutgoingMessage::class);
+        $response = $this->prophesize(ResponseMessage::class);
 
-        $result = $client->sendAction($action);
-        static::assertSame($response, $result);
+        $sendingActionEvent = new Event\SendingActionEvent($client, $action->reveal());
+        $responseReceivedEvent = new Event\ResponseReceivedEvent($client, $action->reveal(), $response->reveal());
+
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\SendingActionEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($sendingActionEvent);
+
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ResponseReceivedEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($responseReceivedEvent);
+
+        $this->connection->send($action->reveal())
+            ->shouldBeCalled()
+            ->willReturn($response->reveal());
+
+        $this->assertSame($response->reveal(), $client->sendAction($action->reveal()));
+    }
+
+    public function testShouldReconnectOnSendActionError(): void
+    {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('exception');
+
+        $client = $this->getConnectedClient();
+
+        $clientException = new ClientException('exception');
+        $action = $this->prophesize(OutgoingMessage::class);
+        $response = $this->prophesize(ResponseMessage::class);
+
+        $sendingActionEvent = new Event\SendingActionEvent($client, $action->reveal());
+        $responseReceivedEvent = new Event\ResponseReceivedEvent($client, $action->reveal(), $response->reveal());
+
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\SendingActionEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($sendingActionEvent);
+
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ResponseReceivedEvent::class)
+        ))
+            ->shouldNotBeCalled()
+            ->willReturn($responseReceivedEvent);
+
+        $this->connection->open()->shouldBeCalledTimes(2);
+
+        $this->connection->send($action->reveal())
+            ->shouldBeCalled()
+            ->willThrow($clientException);
+
+        $client->sendAction($action->reveal());
+    }
+
+    public function testShouldNotSendActionWhenEventStopPropagation(): void
+    {
+        $client = $this->getConnectedClient();
+
+        $action = $this->prophesize(OutgoingMessage::class);
+        $response = $this->prophesize(ResponseMessage::class);
+
+        $sendingActionEvent = new Event\SendingActionEvent($client, $action->reveal());
+        $sendingActionEvent->setResponse($response->reveal());
+
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\SendingActionEvent::class)
+        ))
+            ->shouldBeCalledOnce()
+            ->willReturn($sendingActionEvent);
+
+        $this->eventDispatcher->dispatch(Argument::allOf(
+            Argument::type(Event\ResponseReceivedEvent::class)
+        ))
+            ->shouldNotBeCalled();
+
+        $this->connection->send($action->reveal())
+            ->shouldNotBeCalled();
+
+        $client->sendAction($action->reveal());
     }
 }

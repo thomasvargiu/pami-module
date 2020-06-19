@@ -1,41 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PamiModule;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
+use PAMI\Client\IClient;
+use PAMI\Client\Impl\ClientImpl;
+use PamiModule\DIFactory\Service\ClientFactory;
+use PamiModule\DIFactory\Service\ConnectionFactory;
+use PamiModule\Service\Client;
+use PamiModule\Service\ClientInterface;
 
-/**
- * Class ConfigProvider.
- */
 class ConfigProvider
 {
     /**
      * Provide dependency configuration for an application integrating i18n.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencyConfig(),
+            'dependencies' => $this->getDependencies(),
         ];
     }
     /**
      * Provide dependency configuration for an application integrating i18n.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getDependencyConfig()
+    public function getDependencies(): array
     {
         return [
+            'aliases' => [
+                IClient::class => ClientImpl::class,
+                ClientInterface::class => Client::class,
+            ],
             'factories' => [
-                Listener\ConnectionStatusListener::class => InvokableFactory::class,
-            ],
-            'abstract_factories' => [
-                Factory\AbstractPamiServiceFactory::class,
-            ],
-            'shared' => [
-                Listener\ConnectionStatusListener::class => false,
+                ClientImpl::class => ConnectionFactory::class,
+                Client::class => ClientFactory::class,
             ],
         ];
     }

@@ -1,7 +1,7 @@
 PamiModule
 ==========
 
-A ZF module for [PAMI](https://github.com/marcelog/PAMI) library.
+A Laminas/Mezzio module for [PAMI](https://github.com/marcelog/PAMI) library.
 
 [![Build Status](https://travis-ci.org/thomasvargiu/pami-module.svg?branch=master)](https://travis-ci.org/thomasvargiu/pami-module)
 [![Code Coverage](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/thomasvargiu/pami-module/?branch=master)
@@ -19,7 +19,7 @@ First, you should define connection and client options in your configuration. Cl
 
 ```php
 return [
-    'pami_module' => [
+    'pami' => [
         'connection' => [
             'default' => [
                 'host' => '', // IP or hostname of asterisk server
@@ -32,34 +32,73 @@ return [
             ]
         ],
         'client' => [
-            'default' => []
-        ]
-    ]
-]
+            'default' => [],
+        ],
+    ],
+];
 ```
 
-Then you can retrieve two services from the service locator:
-- ```pami.client.default```: PamiModule client
+Then you can register your service:
 
+```php
+use PamiModule\DIFactory\Service\ConnectionFactory;
+
+return [
+    'dependencies' => [
+        'factories' => [
+            'pami.connection' => new ConnectionFactory('default'),
+        ],
+    ],
+];
+```
 
 PamiModule Client
 -----------------
 
-You can get the client from the service locator.
+Set your client configuration:
 
 ```php
-use PamiModule\Service\Client;
-use PAMI\Client\Impl\ClientImpl;
+use PamiModule\DIFactory\Service\ConnectionFactory;
+use PamiModule\DIFactory\Service\ClientFactory;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+return [
+    'pami' => [
+        'connection' => [
+            'connection1' => [
+                // connection params
+            ]
+        ],
+        'client' => [
+            'client1' => [
+                'connection' => 'pami.connection', // connection service name
+                'event_dispatcher' => EventDispatcher::class, // your PSR EventDispatcher service name
+            ],
+        ],
+    ],
+    'dependencies' => [
+        'factories' => [
+            'pami.connection' => new ConnectionFactory('connection1'),
+            'pami.client' => new ClientFactory('client1'),
+        ],
+    ],
+];
+```
+
+Now you can get the client from your DI Container.
+
+```php
+use PamiModule\Service\ClientInterface;
 
 // Getting the PamiModule client
-/** @var Client $client */
-$client = $serviceLocator->get('pami.client.default');
+/** @var ClientInterface $client */
+$client = $container->get('pami.client');
 ```
 
 
 ### Methods
 
-The original ```Pami``` client (the connection) is injected into the ```PamiModule```, and the ```PamiModule``` actions 
+The original `Pami` client (the connection) is injected into the `PamiModule`, and the `PamiModule` actions 
 delegates the original client.
 
 *Mapped Actions:*
@@ -74,188 +113,62 @@ delegates the original client.
 
 ### Events
 
-The ```PamiModule``` client has an ```EventManager``` instance injected into it.  
-The following methods will trigger events with the same name of the method and  ```.pre``` and ```.post``` suffix:
- 
-- ```connect()```
-- ```disconnect()```
-- ```process()```
-- ```sendAction()```
+The `PamiModule` client requires an `EventDispatcher` instance and some events are dispatched:
 
-The ```sendAction()``` events have ```action``` param in ```sendAction.pre``` event
-and ```action``` and ```response``` params in ```sendAction.post``` event, allowing you to modify the action before it
-will be dispatched or to cache responses.
-
+- `PamiModule\Event\ConnectingEvent`
+- `PamiModule\Event\ConnectedEvent`
+- `PamiModule\Event\DisconnectingEvent`
+- `PamiModule\Event\DisconnectedEvent`
+- `PamiModule\Event\SendingActionEvent`
+- `PamiModule\Event\ResponseReceivedEvent`
+- `PamiModule\Event\PamiEvent`
 
 PAMI events
 -----------
  
-All PAMI events are forwarded to the event manager that will trigger an event (```PamiModule\Event\PamiEvent```).  
-The name of the event will be ```event.<name>``` (example: ```event.ExtensionStatus```).  
-Of course, you can acces to the original event to retrieve event data (see example below).  
-The event target is the ```PamiModule``` client.  
+All PAMI events are forwarded and dispatched as `PamiModule\Event\PamiEvent` event.
 
 Example:
 ```php
 
-use PamiModule\Service\Client;
+use PamiModule\Service\ClientInterface;
 use PamiModule\Event\PamiEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
-/* @var Client $client */
-$client = $serviceLocator->get('pami.client.default');
-$client->getEventManager()->attach('event.Bridge', function(PamiEvent $event) {
-    // Getting the client
-    /* @var Client $client */
-    $client = $event->getTarget();
-    
-    // Getting the original Event
-    /* @var \PAMI\Message\Event\BridgeEvent $pamiEvent */
+/* @var ClientInterface $client */
+$client = $container->get('pami.client.default');
+$eventDispatcher = $container->get(EventDispatcherInterface::class);
+
+$listener = static function (PamiEvent $event) {
+    $client = $event->getClient();
+    $eventName = $event->getEventName();
     $pamiEvent = $event->getEvent();
-});
+};
 ```
 
 
-Multiple clients
-----------------
+### CachedClientDecorator
 
-```php
-return [
-    'pami_module' => [
-        'connection' => [
-            'default' => [
-                // configuration
-            ],
-            'asterisk2' => [
-                // configuration
-            ]
-        ],
-        'client' => [
-            'default' => [],
-            'asterisk2 => []
-        ]
-    ]
-]
-```
-
-You can retrieve clients with service names:
-- ```pami.client.default```
-- ```pami.client.asterisk2```
-
-
-### Multiple clients sharing the same connection
-
-You can create another client with the same connection of another one:
-
-```php
-return [
-    'pami_module' => [
-        'connection' => [
-            'default' => [
-                // configuration
-            ]
-        ],
-        'client' => [
-            'default' => [
-                'connection' => 'default'
-            ],
-            'client2' => [
-                'connection' => 'default'
-            ]
-        ]
-    ]
-]
-```
-
-```php
-$client1 = $serviceLocator->get('pami.client.default');
-$client2 = $serviceLocator->get('pami.client.client2');
-
-$client1->getConnection() === $client2->getConnection(); // true
-```
-
-
-Getting the original PAMI client
---------------------------------
-
-You can retrieve the original PAMI client in two ways:
-
-From service locator:
-```php
-use PAMI\Client\Impl\ClientImpl;
-
-/* @var ClientImpl $connection */
-$connection = $serviceLocator->get('pami.connection.default');
-```
-
-From the ```PamiModule``` client:
-```php
-use PamiModule\Service\Client;
-use PAMI\Client\Impl\ClientImpl;
-
-// Getting the PamiModule client
-/* @var Client $client */
-$client = $serviceLocator->get('pami.client.default');
-// Getting the PAMI client
-/* @var ClientImpl $connection */
-$connection = $client->getConnection();
-```
-
-
-Available Listeners
--------------------
-
-There are listeners ready to be used.
-
-- ```PamiModule\Listener\ConnectionStatusListener```
-- ```PamiModule\Listener\CacheListener```
-
-
-### ConnectionStatusListener
-
-This listener takes care to maintain a connection status, and to call ```connect()``` method when is required.  
-It can be useful when you share the client between some services, because you don't need to call ```connect()``` methods
-without to know the connection status. You can call directly ```process()``` and ```sendAction()``` methods and it will 
-automatically calls ```connect()``` if a connection is not already opened.  
-You can also use ```connect()``` and ```disconnect()``` methods at any point of your application, the listener takes 
-care to open or close connection only if is really necessary.  
-In order to use this listener, you can't use the connection (the original ```PAMI``` client) directly, because the connection 
-status is maintained listening the ```PamiModule``` client events.
-
-If you want to use the listener in multiple clients, you need to attach a new instance of it for every client.
-
-You have to attach it to the client before to call any methods, so the best way is to use a delegator factory. 
-This library provide a ready to use delegator factory:
-
-```php
-return [
-    'service_manager' => [
-        'delegators' => [
-            'pami.client.default' => [
-                'PamiModule\\Service\\ConnectionStatusDelegatorFactory'
-            ]
-        ]
-    ]
-];
-```
-
-Note: if you share some connection between clients, you must attach the same listener to the clients, so you need to 
-create your custom DelegatorFactory.
-
-### CacheListener
-
-You can use the CacheListener to cache results of some actions.
+You can use the CachedClientDecorator to decorate the `PamiModule` client and cache some actions.
 The constructor require a cache storage instance and the action names that listener can cache response. 
 
 ```php
-use PamiModule\Listener\CacheListener;
-use Zend\Cache\Storage\StorageInterface;
+use Psr\SimpleCache\CacheInterface;
+use PamiModule\Service\ClientInterface;
+use PamiModule\Service\CachedClientDecorator;
 
-$client = $serviceLocator->get('pami.client.default')
-/* @var StorageInterface $cache */
-$cache = $serviceLocator->get('asterisk_sippeers_cache');
+/** @var ClientInterface $client */
+$client = $container->get('pami.client');
+$cache = $container->get(CacheInterface::class);
 
-$actionsToCache = ['SIPPeers', 'ShowPeer'];
-$cacheListener = new CacheListener($cache, $actionsToCache);
+$cachedClient = new CachedClientDecorator(
+    $client,
+    $cache,
+    [
+        'SIPPeers' => 60, // key is the action name, value is the cache TTL
+        'ShowPeer', // use the default cache TTL for ShowPeer action 
+    ],
+    60 // default cache TTL
+);
 
-$client->getEventManager()->attachAggregate($cacheListener);
 ```

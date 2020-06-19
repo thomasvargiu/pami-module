@@ -1,36 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PamiModule\Event;
 
 use PAMI\Message\Event\EventMessage;
-use Zend\EventManager\Event;
+use PamiModule\Service\ClientInterface;
 
-/**
- * Class PamiEvent.
- */
-class PamiEvent extends Event
+final class PamiEvent
 {
+    private ClientInterface $client;
+    private EventMessage $event;
+
+    public function __construct(ClientInterface $client, EventMessage $event)
+    {
+        $this->client = $client;
+        $this->event = $event;
+    }
+
+    public function getClient(): ClientInterface
+    {
+        return $this->client;
+    }
+
     /**
      * Get the PAMI event.
      *
      * @return EventMessage
      */
-    public function getEvent()
+    public function getEvent(): EventMessage
     {
-        return $this->getParam('event');
+        return $this->event;
     }
 
-    /**
-     * Set the PAMI event.
-     *
-     * @param EventMessage $event PAMI event
-     *
-     * @return $this
-     */
-    public function setEvent(EventMessage $event)
+    public function getEventName(): string
     {
-        $this->setParam('event', $event);
-
-        return $this;
+        return $this->event->getName();
     }
 }

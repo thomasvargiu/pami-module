@@ -1,6 +1,9 @@
 <?php
+
+use Psr\EventDispatcher\EventDispatcherInterface;
+
 return [
-    'pami_module' => [
+    'pami' => [
         'connection' => [
             'default' => [
                 'host' => '',
@@ -9,11 +12,12 @@ return [
                 'username' => 'admin',
                 'secret' => '',
                 'connect_timeout' => 30,
-                'read_timeout' => 3000
-            ]
+                'read_timeout' => 3000,
+            ],
         ],
         'client' => [
-            'connection' => 'default'
+            'connection' => \PAMI\Client\IClient::class,
+            'event_dispatcher' => EventDispatcherInterface::class,
         ]
     ],
 ];

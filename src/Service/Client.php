@@ -1,184 +1,138 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PamiModule\Service;
 
-use ArrayObject;
-use PAMI\Client\Impl\ClientImpl;
+use PAMI\Client\Exception\ClientException;
+use PAMI\Client\IClient;
 use PAMI\Message\OutgoingMessage;
 use PAMI\Message\Response\ResponseMessage;
-use Zend\EventManager\Event;
-use Zend\EventManager\EventManagerAwareTrait;
-use Zend\EventManager\EventsCapableInterface;
+use PamiModule\Event;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class Client.
- */
-class Client implements EventsCapableInterface
+class Client implements ClientInterface
 {
-    use EventManagerAwareTrait;
+    private IClient $connection;
 
-    /**
-     * PAMI client.
-     *
-     * @var ClientImpl
-     */
-    protected $connection;
-    /**
-     * Custom parameters.
-     *
-     * @var array
-     */
-    protected $params = [];
-    /**
-     * @var string
-     */
-    protected $host;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * Client constructor.
-     *
-     * @param string     $host
-     * @param ClientImpl $pami PAMI client
-     */
-    public function __construct($host, ClientImpl $pami)
+    private bool $connected = false;
+
+    public function __construct(IClient $connection, EventDispatcherInterface $eventDispatcher)
     {
-        $this->host = $host;
-        $this->connection = $pami;
-    }
-
-    /**
-     * Return the hostname of the connection.
-     *
-     * @return string
-     */
-    public function getHost()
-    {
-        return $this->host;
+        $this->connection = $connection;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->connection->registerEventListener(new EventForwarder($this, $eventDispatcher));
     }
 
     /**
      * Return the PAMI client.
      *
-     * @return ClientImpl
+     * @return IClient
      */
-    public function getConnection()
+    public function getConnection(): IClient
     {
         return $this->connection;
     }
 
     /**
-     * Return the custom parameters.
-     *
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    /**
-     * Set the custom parameters.
-     *
-     * @param array $params Parameters
-     *
-     * @return $this
-     */
-    public function setParams(array $params)
-    {
-        $this->params = $params;
-
-        return $this;
-    }
-
-    /**
      * Connect to the Asterisk Manager Interface.
      *
-     * @throws \PAMI\Client\Exception\ClientException
-     *
-     * @return $this
+     * @throws ClientException
      */
-    public function connect()
+    public function connect(): void
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this);
-        if ($results->stopped()) {
-            return $this;
+        if ($this->connected) {
+            return;
+        }
+
+        /** @var Event\ConnectingEvent $event */
+        $event = $this->eventDispatcher->dispatch(new Event\ConnectingEvent($this));
+
+        if ($event->isPropagationStopped()) {
+            return;
         }
 
         $this->connection->open();
+        $this->connected = true;
 
-        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this);
-
-        return $this;
+        $this->eventDispatcher->dispatch(new Event\ConnectedEvent($this));
     }
 
     /**
      * Disconnect from the Asterisk Manager Interface.
-     *
-     * @return $this
      */
-    public function disconnect()
+    public function disconnect(): void
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this);
-        if ($results->stopped()) {
-            return $this;
+        if (! $this->connected) {
+            return;
         }
 
+        /** @var Event\ConnectingEvent $event */
+        $event = $this->eventDispatcher->dispatch(new Event\DisconnectingEvent($this));
+
+        if ($event->isPropagationStopped()) {
+            return;
+        }
+
+        $this->connected = false;
         $this->connection->close();
 
-        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this);
-
-        return $this;
+        $this->eventDispatcher->dispatch(new Event\DisconnectedEvent($this));
     }
 
     /**
      * Main processing loop. Also called from send(), you should call this in
      * your own application in order to continue reading events and responses
      * from ami.
-     *
-     * @return $this
      */
-    public function process()
+    public function process(): void
     {
-        $results = $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this);
-
-        if ($results->stopped()) {
-            return $this;
+        try {
+            $this->connection->process();
+        } catch (ClientException $e) {
+            $this->reconnect();
+            $this->connection->process();
         }
+    }
 
-        $this->connection->process();
-
-        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this);
-
-        return $this;
+    private function reconnect(): void
+    {
+        $this->connected = false;
+        $this->connect();
     }
 
     /**
      * Sends a message to AMI.
      *
-     * @param OutgoingMessage $action Action to send
-     *
-     * @throws \PAMI\Client\Exception\ClientException
-     *
-     * @return \PAMI\Message\Response\ResponseMessage
+     * @param OutgoingMessage $action
+     * @return ResponseMessage
+     * @throws ClientException
      */
-    public function sendAction(OutgoingMessage $action)
+    public function sendAction(OutgoingMessage $action): ResponseMessage
     {
-        $params = new ArrayObject(['action' => $action]);
-        $event = new Event(__FUNCTION__ . '.pre', $this, $params);
-        $results = $this->getEventManager()->triggerEventUntil(
-            function ($response) {
-                return $response instanceof ResponseMessage;
-            },
-            $event
-        );
-        if ($results->stopped()) {
-            return $results->last();
+        /** @var Event\SendingActionEvent $event */
+        $event = $this->eventDispatcher->dispatch(new Event\SendingActionEvent($this, $action));
+
+        if ($event->isPropagationStopped()) {
+            $response = $event->getResponse();
+
+            if (null === $response) {
+                throw new \RuntimeException('Action stopped without a response');
+            }
+
+            return $response;
         }
 
-        $response = $this->connection->send($action);
+        try {
+            $response = $this->connection->send($action);
+        } catch (ClientException $e) {
+            $this->reconnect();
+            throw $e;
+        }
 
-        $params['response'] = $response;
-        $this->getEventManager()->trigger(__FUNCTION__ . '.post', $this, $params);
+        $this->eventDispatcher->dispatch(new Event\ResponseReceivedEvent($this, $action, $response));
 
         return $response;
     }
