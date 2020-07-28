@@ -89,6 +89,10 @@ class Client implements ClientInterface
      */
     public function process(): void
     {
+        if (! $this->connected) {
+            $this->connect();
+        }
+
         try {
             $this->connection->process();
         } catch (ClientException $e) {
@@ -112,6 +116,10 @@ class Client implements ClientInterface
      */
     public function sendAction(OutgoingMessage $action): ResponseMessage
     {
+        if (! $this->connected) {
+            $this->connect();
+        }
+
         /** @var Event\SendingActionEvent $event */
         $event = $this->eventDispatcher->dispatch(new Event\SendingActionEvent($this, $action));
 
