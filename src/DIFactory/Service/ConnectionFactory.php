@@ -6,9 +6,11 @@ namespace PamiModule\DIFactory\Service;
 
 use PAMI\Client\Impl\ClientImpl;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use function count;
 use function implode;
 use function is_array;
+use function is_string;
 
 final class ConnectionFactory
 {
@@ -32,6 +34,11 @@ final class ConnectionFactory
             $eventMask = implode(', ', $eventMask);
         }
 
+        $logger = null;
+        if (is_string($options['logger'] ?? null)) {
+            $logger = $container->get($options['logger']);
+        }
+
         $clientOptions = [
             'host' => $options['host'] ?? 'localhost',
             'port' => (int) ($options['port'] ?? 5038),
@@ -44,7 +51,13 @@ final class ConnectionFactory
         ];
 
         /** @phpstan-ignore-next-line */
-        return new ClientImpl($clientOptions);
+        $client = new ClientImpl($clientOptions);
+
+        if ($logger instanceof LoggerInterface) {
+            $client->setLogger($logger);
+        }
+
+        return $client;
     }
 
     /**
